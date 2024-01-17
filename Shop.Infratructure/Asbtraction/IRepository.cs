@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Shop.Infratructure.Asbtraction
 {
-    public interface IUserRepository<Entity> where Entity : BaseEntity
+    public interface IRepository<Entity> where Entity : BaseEntity
     {
-        public Task<Entity> GetUserById(Guid Id);
+        public Task<Entity> GetById(Guid Id);
         public Task<List<Entity>> GetAll();
-        public Task<int> DeleteUserById(Guid Id);
-        public Task<int> UpdateUserById(Guid Id);
+        public Task<int> DeleteById(Guid Id);
+        public Task<int> UpdateById(Guid Id);
     }
 }

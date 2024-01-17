@@ -1,5 +1,7 @@
-﻿using Shop.Domain.Abstraction;
+﻿using Microsoft.EntityFrameworkCore;
+using Shop.Domain.Abstraction;
 using Shop.Domain.Entities;
+using Shop.Infratructure.AplicatonDBcontext;
 using Shop.Infratructure.Asbtraction;
 using System;
 using System.Collections.Generic;
@@ -9,24 +11,32 @@ using System.Threading.Tasks;
 
 namespace Shop.Infratructure.Repositories
 {
-    public class UserRepository<TEntity> : IUserRepository<TEntity> where TEntity : BaseEntity
+    public class UserRepository : IRepository<User>
     {
-        public Task<int> DeleteUserById(Guid Id)
+        private readonly ApplicationDbContext _context;
+        public UserRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public Task<int> DeleteById(Guid Id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<int> UpdateUserById(Guid Id)
+        public async Task<List<User>> GetAll()
         {
-            throw new NotImplementedException();
+            var Users = await _context.User.ToListAsync();
+            return Users;
         }
 
-        Task<List<TEntity>> IUserRepository<TEntity>.GetAll()
+        public async Task<User> GetById(Guid Id)
         {
-            throw new NotImplementedException();
+            var  User =  await _context.User.FindAsync(Id);
+            return User;
         }
 
-        Task<TEntity> IUserRepository<TEntity>.GetUserById(Guid Id)
+        public Task<int> UpdateById(Guid Id)
         {
             throw new NotImplementedException();
         }

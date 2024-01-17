@@ -9,7 +9,7 @@ namespace Shop.Api.Extentions
     {
         public static void addSevices(this WebApplicationBuilder builder)
         {
-            builder.Services.AddTransient<UserRepository<User>>();
+            builder.Services.AddTransient<UserRepository>();
         }
     }
 }
