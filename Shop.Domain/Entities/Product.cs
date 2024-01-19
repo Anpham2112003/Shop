@@ -1,6 +1,4 @@
-﻿
-
-using Shop.Domain.Abstraction;
+﻿using Shop.Domain.Abstraction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +14,16 @@ namespace Shop.Domain.Entities
 
         public string? Name{get;set;}
         
-        public decimal Price{get;set;}
-        
-        public string? Decriptions{get;set;}
+        public double Price{get;set;}
         
         public int Quantity{get;set;}
+        public string? Description { get;set;}
+
+        public Guid? BrandId { get;set;}
+        public Brand? Brand { get;set;}
+        public bool IsSale {  get;set;}
+        public float? DisCount {  get;set;}
+        public double? PriceDisCount {  get;set;}
         public  DateTime CreatedAt { get;set;}
 
         public DateTime? UpdatedAt { get;set;}
@@ -28,5 +31,10 @@ namespace Shop.Domain.Entities
         public bool IsDeleted { get;set;}
 
         public DateTime? DeletedAt {  get;set;}  
+
+        public ICollection<ProductCategory>? ProductCategories { get; set;}
+        public ICollection<Image>? images { get; set; }
+       
+
     }
 }
