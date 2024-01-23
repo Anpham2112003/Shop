@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Shop.Infratructure.Repositories
 {
-    public class UserRepository : IRepository<User>
+    public class UserRepository : IUserRepository
     {
         private readonly ApplicationDbContext _context;
         public UserRepository(ApplicationDbContext context)
@@ -21,19 +21,29 @@ namespace Shop.Infratructure.Repositories
 
         public Task<int> DeleteById(Guid Id)
         {
+            
             throw new NotImplementedException();
         }
 
-        public async Task<List<User>> GetAll()
+        public Task<int> DeleteRange(IEnumerable<User> entities)
         {
-            var Users = await _context.User.ToListAsync();
-            return Users;
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<User>>? GetAll()
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<User> GetById(Guid Id)
         {
-            var  User =  await _context.User.FindAsync(Id);
-            return User;
+          return await _context.Users!.FindAsync(Id);
+        }
+
+        public async Task<int> InsertRangeAsync(IEnumerable<User> entities)
+        {
+            await _context.AddRangeAsync(entities);
+            return await _context.SaveChangesAsync();
         }
 
         public Task<int> UpdateById(Guid Id)

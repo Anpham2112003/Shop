@@ -33,7 +33,10 @@ namespace Shop.Domain.Entities
         public DateTime? DeletedAt {  get;set;}  
 
         public ICollection<ProductCategory>? ProductCategories { get; set;}
-        public ICollection<Image>? images { get; set; }
+        public ICollection<Image>? Images { get; set; }
+        public ICollection<Cart>? Carts { get; set;} 
+
+        public ICollection<Comment>? Comments { get; set; }
        
 
     }

@@ -23,5 +23,6 @@ namespace Shop.Domain.Entities
         public DateTime? DeletedAt { get; set; }
         public ICollection<Order>? Orders { get; set; }
         public ICollection<Comment>? Comments { get; set; }
+        public ICollection<Cart>? Carts { get; set; }
     }
 }
