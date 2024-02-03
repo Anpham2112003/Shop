@@ -20,7 +20,7 @@ namespace Shop.Aplication.Command
         public void HandleCommand(CreateUserCommand command)
         {
 
-           var User= _userRepository.GetById(command.Id);
+           var User= _userRepository.GetByIdAsync(command.Id);
             if(User is not null)
             {
                 throw new ArgumentException("User da ton tai");
