@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Shop.Domain.Interfaces;
 using Shop.Infratructure.AplicatonDBcontext;
+using Shop.Infratructure.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,8 @@ namespace Shop.Infratructure.Dependency
                     op.MigrationsAssembly("Shop.Infratructure");
                 });
             });
-
+            services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddTransient(typeof(IUserRepository<>), typeof(UserRepository));
             return services;
         }
     }

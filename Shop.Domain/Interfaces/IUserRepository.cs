@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Shop.Domain.Interfaces
 {
-    public interface IUserRepository<Entity>:IGenericRepository<Entity> where Entity :class, BaseEntity
+    public interface IUserRepository<Entity>:IGenericRepository<Entity> where Entity :class,BaseEntity
     {
         Task<IEnumerable<Entity>> GetAllAsync(int page,int take);
         Task<int> Count();
