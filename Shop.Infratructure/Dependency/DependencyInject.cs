@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shop.Domain.Interfaces;
 using Shop.Infratructure.AplicatonDBcontext;
 using Shop.Infratructure.Repository;
+using Shop.Infratructure.UnitOfWork;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace Shop.Infratructure.Dependency
             });
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddTransient(typeof(IUserRepository<>), typeof(UserRepository));
+            services.AddSingleton<IUnitOfWork, UnitofWork>();
             return services;
         }
     }
