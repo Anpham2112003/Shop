@@ -18,9 +18,9 @@ namespace Shop.Infratructure.UnitOfWork
         {
             _context = context;
         }
-        private IGenericRepository<User> UserRepository;
+        private IUserRepository<User> UserRepository;
       
-        public IGenericRepository<User> userRepository
+        public IUserRepository<User> userRepository
         {
             get
             {
@@ -32,19 +32,20 @@ namespace Shop.Infratructure.UnitOfWork
             }
         }
 
-        private IGenericRepository<Product> ProductRepository;
-        public IGenericRepository<Product> productRepository
+        private IProductRepository<Product> ProductRepository;
+        public IProductRepository<Product> productRepository
         {
             get {
+
                 if(ProductRepository == null)
-                {
-                    ProductRepository= new ProductRepository(_context);
-                } 
+                    {
+                        ProductRepository= new ProductRepository(_context);
+                    } 
                 return ProductRepository;
             }
         }
-        public IGenericRepository<Comment> CommentRepository;
-        public IGenericRepository<Comment> commentRepository
+        public ICommentRepository<Comment> CommentRepository;
+        public ICommentRepository<Comment> commentRepository
         {
             get
             {
@@ -55,9 +56,9 @@ namespace Shop.Infratructure.UnitOfWork
                 return CommentRepository;
             }
         }
-        private IGenericRepository<Category> CategoryRepository;
+        private ICategoryRepository<Category> CategoryRepository;
 
-        public IGenericRepository<Category> categoryRepository
+        public ICategoryRepository<Category> categoryRepository
         {
             get
             {
@@ -68,9 +69,9 @@ namespace Shop.Infratructure.UnitOfWork
                 return CategoryRepository;
             }
         }
-        private IGenericRepository<Cart> CartRepository;
+        private ICartRepository<Cart> CartRepository;
 
-        public IGenericRepository<Cart> cartRepository
+        public ICartRepository<Cart> cartRepository
         {
             get
             {
@@ -82,8 +83,8 @@ namespace Shop.Infratructure.UnitOfWork
             }
         }
 
-        private IGenericRepository<Image> ImageRepository;
-        public IGenericRepository<Image> imageRepository {
+        private IImageRepository<Image> ImageRepository;
+        public IImageRepository<Image> imageRepository {
             get
             {
                 if(ImageRepository == null)
@@ -94,8 +95,8 @@ namespace Shop.Infratructure.UnitOfWork
             }
         }
 
-        private IGenericRepository<ProductCategory> ProductCategoryRepository;
-        public IGenericRepository<ProductCategory> productCategoryRepository
+        private IProductCategoryRepository<ProductCategory> ProductCategoryRepository;
+        public IProductCategoryRepository<ProductCategory> productCategoryRepository
         {
             get
             {
@@ -106,8 +107,8 @@ namespace Shop.Infratructure.UnitOfWork
                 return ProductCategoryRepository;
             }
         }
-        private IGenericRepository<Order> OrderRepository;
-        public IGenericRepository<Order> orderRepository
+        private IOrderRepository<Order> OrderRepository;
+        public IOrderRepository<Order> orderRepository
         {
             get
             {
@@ -118,8 +119,8 @@ namespace Shop.Infratructure.UnitOfWork
                 return OrderRepository;
             }
         }
-        private IGenericRepository<Brand> BrandRepository;
-        public IGenericRepository<Brand> brandRepository
+        private IBrandRepository<Brand> BrandRepository;
+        public IBrandRepository<Brand> brandRepository
         {
             get
             {
@@ -136,9 +137,13 @@ namespace Shop.Infratructure.UnitOfWork
             
         }
 
-        public void SaveChange()
+        public void SaveChanges()
         {
             _context.SaveChanges();
+        }
+        public void SaveChangesAsync()
+        {
+            _context.SaveChangesAsync();
         }
     }
     }

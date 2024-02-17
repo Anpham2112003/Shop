@@ -10,17 +10,18 @@ namespace Shop.Infratructure.UnitOfWork
 {
     public interface IUnitOfWork : IDisposable
     {
-        IGenericRepository<User> userRepository { get; }
-        IGenericRepository<Product> productRepository { get; }
-        IGenericRepository<Comment> commentRepository { get; }
-        IGenericRepository<Category> categoryRepository { get; }
-        IGenericRepository<Cart> cartRepository { get; }
-        IGenericRepository<Image> imageRepository { get; }
-        IGenericRepository<ProductCategory> productCategoryRepository { get; }
-        IGenericRepository<Order> orderRepository { get; }
-        IGenericRepository<Brand> brandRepository { get; }
+        IUserRepository<User> userRepository { get; }
+        IProductRepository<Product> productRepository { get; }
+        ICommentRepository<Comment> commentRepository { get; }
+        ICategoryRepository<Category> categoryRepository { get; }
+        ICartRepository<Cart> cartRepository { get; }
+        IImageRepository<Image> imageRepository { get; }
+        IProductCategoryRepository<ProductCategory> productCategoryRepository { get; }
+        IOrderRepository<Order> orderRepository { get; }
+        IBrandRepository<Brand> brandRepository { get; }
 
-        public void SaveChange();
+        public void SaveChanges();
+        public void SaveChangesAsync();
 
     }
 }
