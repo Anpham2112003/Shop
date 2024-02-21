@@ -85,6 +85,7 @@ namespace Shop.Infratructure.AplicatonDBcontext
                     .HasForeignKey(k => k.ProductId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired();
+                
             });
 
             modelBuilder.Entity<Category>(op =>
@@ -122,6 +123,10 @@ namespace Shop.Infratructure.AplicatonDBcontext
             modelBuilder.Entity<Order>(op =>
             {
                 op.HasKey(k => k.Id);
+                op.HasOne(o => o.Product)
+                    .WithOne(o => o.Order)
+                    .HasForeignKey<Order>(k => k.ProductFK)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
             
 

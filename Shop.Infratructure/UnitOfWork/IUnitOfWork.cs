@@ -20,8 +20,8 @@ namespace Shop.Infratructure.UnitOfWork
         IOrderRepository<Order> orderRepository { get; }
         IBrandRepository<Brand> brandRepository { get; }
 
-        public void SaveChanges();
-        public void SaveChangesAsync();
+        public int SaveChanges();
+        public Task<int> SaveChangesAsync();
 
     }
 }

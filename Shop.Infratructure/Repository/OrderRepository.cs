@@ -29,6 +29,18 @@ namespace Shop.Infratructure.Repository
                 .Where(x=>x.Id==Id&&x.IsPayment==true)
                 .AsNoTracking()
                 .Skip((page-1)*take).Take(take)
+                .Select(x=>new Order()
+                {
+                    Id = x.Id,
+                    UserName = x.UserName,
+                    Email = x.Email,
+                    Phonenumber=x.Phonenumber,
+                    Address = x.Address,
+                    Quantity= x.Quantity,
+                    TotalPrice= x.TotalPrice,
+                    PaymentMethod= x.PaymentMethod,
+                    
+                })
                 .ToListAsync();
             return Result;
         }
@@ -39,6 +51,17 @@ namespace Shop.Infratructure.Repository
                 .Where(x => x.Id == Id && x.IsPayment == false)
                 .AsNoTracking()
                 .Skip((page - 1) * take).Take(take)
+                .Select(x=>new Order()
+                {
+                    Id= x.Id,
+                    UserName = x.UserName,
+                    Email = x.Email,
+                    Phonenumber = x.Phonenumber,
+                    Address = x.Address,
+                    Quantity= x.Quantity,
+                    TotalPrice= x.TotalPrice,
+                    OrderState= x.OrderState,
+                })
                 .ToListAsync();
             return Result;
         }

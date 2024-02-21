@@ -37,6 +37,7 @@ namespace Shop.Domain.Entities
         public ICollection<Cart>? Carts { get; set;} 
 
         public ICollection<Comment>? Comments { get; set; }
+        public Order? Order { get; set;} 
        
 
     }

@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Shop.Infratructure\Shop.Infratructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.2.0" />
+  </ItemGroup>
+
 </Project>

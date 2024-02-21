@@ -26,7 +26,19 @@ namespace Shop.Infratructure.Repository
 
         public async Task<IEnumerable<User>> GetAllAsync(int page, int take)
         {
-            var Result= await _context.Set<User>().Skip((page-1)*take).Take(take).ToListAsync();
+            var Result= await _context.Set<User>()
+                .Skip((page - 1) * take)
+                .Take(take)
+                .AsNoTracking()
+                .Select(x => new User {
+                    Id = x.Id,
+                    FullName = x.FullName,
+                    Email = x.Email,
+                    CreatedAt = x.CreatedAt,
+                    IsDeleted=x.IsDeleted,
+                    Role = x.Role,
+                })
+                .ToListAsync();
             return Result;
         }
     }

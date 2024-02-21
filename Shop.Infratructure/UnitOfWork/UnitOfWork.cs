@@ -137,13 +137,13 @@ namespace Shop.Infratructure.UnitOfWork
             
         }
 
-        public void SaveChanges()
+        public int SaveChanges()
         {
-            _context.SaveChanges();
+           return _context.SaveChanges();
         }
-        public void SaveChangesAsync()
+        public async Task<int> SaveChangesAsync()
         {
-            _context.SaveChangesAsync();
+          return await _context.SaveChangesAsync();
         }
     }
     }
