@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
 using MediatR;
+using Shop.Aplication.Notify;
+using Shop.Aplication.ResultOrError;
 using Shop.Domain.Entities;
 using Shop.Infratructure.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Shop.Aplication.ResultOrError;
 
-namespace Shop.Domain.RequestModel
+namespace Shop.Aplication.Commands
 {
     public class CreateUserCommand:IRequest<IResult<CreateUserCommand>>
     {
@@ -28,13 +24,15 @@ namespace Shop.Domain.RequestModel
         public string? Email { get; set; }
         public string? Password { get; set; }
 
-        public string? Role
+        public Guid RoleId
         {
             get
             {
-                return "User";
+                return Guid.Parse("c52b4602-cd0a-4562-8d4e-13da5dda13cc");
             }
         }
+
+        public bool IsActive = false;
         public DateTime CreatedAt = DateTime.UtcNow;
 
     }
@@ -42,15 +40,18 @@ namespace Shop.Domain.RequestModel
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public HandCreateUserCommand(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IPublisher _publisher;
+        
+        public HandCreateUserCommand(IUnitOfWork unitOfWork, IMapper mapper, IPublisher publisher)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _publisher = publisher;
         }
 
         public async Task<IResult<CreateUserCommand>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            var findUser = _unitOfWork.userRepository.Find(x => x.Email == request.Email).FirstOrDefault();
+            var findUser =await _unitOfWork.userRepository.GetUserByEmail(request.Email);
             if (findUser is not null)
             {
                 return new  BadRequest<CreateUserCommand>("Account already exists!");
@@ -60,6 +61,7 @@ namespace Shop.Domain.RequestModel
             {
                 await _unitOfWork.userRepository.AddAsync(user);
                 await  _unitOfWork.SaveChangesAsync();
+                await _publisher.Publish(new CreateUserNotify(request), cancellationToken);
                 return new Created<CreateUserCommand>("Created success", request);
             }
             catch (Exception e)

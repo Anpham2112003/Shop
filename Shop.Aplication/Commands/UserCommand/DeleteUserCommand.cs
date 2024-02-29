@@ -37,13 +37,11 @@ namespace Shop.Aplication.Commands
             {
                 var user = await _unitOfWork.userRepository.GetByIdAsync(request.Id);
 
-                if (user == null)
-                {
-                    return new NotFound<DeleteUserCommand>("Cant not delete user because not found UserId= " + request.Id);
-                }
+                if (user == null) return new NotFound<DeleteUserCommand>("Cant not delete user because not found UserId= " + request.Id);
+                
 
                 _unitOfWork.userRepository.Remove(user);
-                _unitOfWork.SaveChanges();
+                await _unitOfWork.SaveChangesAsync();
                 return new Ok<DeleteUserCommand>("success",request);
 
             }
