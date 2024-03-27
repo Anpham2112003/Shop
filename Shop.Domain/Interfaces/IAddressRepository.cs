@@ -1,6 +1,6 @@
 ﻿namespace Shop.Domain.Interfaces;
 
-public class IOrderDetailRepository
+public class IAddressRepository
 {
     
 }
