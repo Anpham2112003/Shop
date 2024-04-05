@@ -1,22 +1,14 @@
 ﻿using AutoMapper;
 using MediatR;
 using Shop.Aplication.Notify;
-using Shop.Aplication.ResultOrError;
 using Shop.Domain.Entities;
 using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands
 {
-    public class CreateUserCommand:IRequest<IResult<CreateUserCommand>>
+    public class CreateUserCommand:IRequest<bool>
     {
-        public Guid Id
-        {
-            get
-            {
-                return Guid.NewGuid();
-            }
-            
-        }
+        public Guid Id => Guid.NewGuid();
 
         public string? FistName { get; set; }
         public string? LastName {  get; set; }
@@ -24,19 +16,13 @@ namespace Shop.Aplication.Commands
         public string? Email { get; set; }
         public string? Password { get; set; }
 
-        public Guid RoleId
-        {
-            get
-            {
-                return Guid.Parse("c52b4602-cd0a-4562-8d4e-13da5dda13cc");
-            }
-        }
+        public Guid RoleId=Guid.Parse("c1bb2db4-a327-431f-9d7b-5122d6e17c28");
 
-        public bool IsActive = false;
+        public readonly bool IsActive = false;
         public DateTime CreatedAt = DateTime.UtcNow;
 
     }
-    public class HandCreateUserCommand : IRequestHandler<CreateUserCommand, IResult<CreateUserCommand>>
+    public class HandCreateUserCommand : IRequestHandler<CreateUserCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -49,24 +35,24 @@ namespace Shop.Aplication.Commands
             _publisher = publisher;
         }
 
-        public async Task<IResult<CreateUserCommand>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            var findUser =await _unitOfWork.userRepository.GetUserByEmail(request.Email);
-            if (findUser is not null)
-            {
-                return new  BadRequest<CreateUserCommand>("Account already exists!");
-            }
+            var findUser =await _unitOfWork.userRepository.GetUserByEmailAndRole(request.Email);
+            if (findUser is not null) return false;
             var user = _mapper.Map<User>(request);
             try
             {
                 await _unitOfWork.userRepository.AddAsync(user);
+                
                 await  _unitOfWork.SaveChangesAsync();
-                await _publisher.Publish(new CreateUserNotify(request), cancellationToken);
-                return new Created<CreateUserCommand>("Created success", request);
+                
+                await _publisher.Publish(new CreateUserNotification(request), cancellationToken);
+                
+                return true;
             }
             catch (Exception e)
             {
-                return new ServerError<CreateUserCommand>("Cant create new user because sever error!");
+                throw new Exception(e.Message);
             }
 
             

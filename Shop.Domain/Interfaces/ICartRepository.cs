@@ -8,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace Shop.Domain.Interfaces
 {
-    public interface ICartRepository<Entity>:IGenericRepository<Entity> where Entity : class,BaseEntity
+    public interface ICartRepository<TEntity>:IGenericRepository<TEntity> where TEntity : class,BaseEntity
     {
-        Task<IEnumerable<Entity>> GetCartByUserId(Guid Id,int page,int skip);
+        Task<List<Cart>> GetCartByUserId(Guid id, int page, int skip);
+        Task<int> CountCartByUserId(Guid id);
         Task<int> CountAsync();
     }
 }

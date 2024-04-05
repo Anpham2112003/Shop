@@ -18,20 +18,25 @@ namespace Shop.Infratructure.Repository
             _context = context;
         }
 
+        public async Task<int> CountCartByUserId(Guid id)
+        {
+            return await _context.Set<Cart>().Where(x => x.UserId == id).AsNoTracking().CountAsync();
+        }
+
         public async Task<int> CountAsync()
         {
             return await _context.Set<Cart>().CountAsync();
         }
 
-        public async Task<IEnumerable<Cart>> GetCartByUserId(Guid Id, int page, int skip)
+        public async Task<List<Cart>> GetCartByUserId(Guid id, int page, int skip)
         {
-            var Result= await _context.Set<Cart>()
-                .Where(x=>x.UserId == Id)
+            var result= await _context.Set<Cart>()
+                .Where(x=>x.UserId == id)
                 .Skip((page-1)*skip)
                 .Take(skip)
                 .AsNoTracking()
                 .ToListAsync();
-            return Result;
+            return result;
         }
     }
 }

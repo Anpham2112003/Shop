@@ -3,7 +3,7 @@ using Shop.Domain.Entities;
 using Shop.Domain.ResponseModel;
 using Shop.Infratructure.UnitOfWork;
 
-namespace Shop.Aplication.Queries.CommentQueries;
+namespace Shop.Aplication.Queries;
 
 public class GetCommentByProductId:IRequest<PagingResponseModel<List<Comment>>>
 {

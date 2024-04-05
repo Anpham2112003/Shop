@@ -16,11 +16,16 @@ namespace Shop.Infratructure.UnitOfWork
         ICategoryRepository<Category> categoryRepository { get; }
         ICartRepository<Cart> cartRepository { get; }
         IImageRepository<Image> imageRepository { get; }
-        IProductCategoryRepository<ProductCategory> productCategoryRepository { get; }
+       
         IOrderRepository<Order> orderRepository { get; }
         IBrandRepository<Brand> brandRepository { get; }
-
-        public int SaveChanges();
+        
+        IRoleRepository<Role> roleRepository { get; }
+        
+        IShipRepository<Ship> shipRepository { get; }
+        IAddressRepository<Address> addressRepository { get; }
+        IPaymentRepository<Payment> paymentRepository { get; }
+        
         public Task<int> SaveChangesAsync();
 
     }

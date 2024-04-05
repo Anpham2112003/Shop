@@ -5,9 +5,9 @@ using Order = Shop.Domain.Entities.Order;
 
 namespace Shop.Aplication.Notify;
 
-public class PaymentNotify:INotification
+public class PaymentNotification:INotification
 {
-    public PaymentNotify(Order order)
+    public PaymentNotification(Order order)
     {
         this.order = order;
     }

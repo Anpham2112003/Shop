@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shop.Domain.ResponseModel;
 
 namespace Shop.Infratructure.Repository
 {
@@ -23,19 +24,6 @@ namespace Shop.Infratructure.Repository
             return await _context.Set<Category>().CountAsync();
         }
 
-        public async Task<IEnumerable<Category>> GetProductsByCategoryId(Guid Id, int page, int take)
-        {
-           var Result= 
-
-                await _context.Set<Category>()
-                .Where(x=>x.Id==Id).AsNoTracking()
-                .Include(x=>x.ProductCategories)!
-                .ThenInclude(x=>x.Product)
-                .ThenInclude(x=>x.Images)
-                .Skip((page-1)*take).Take(take)
-                .ToListAsync();  
-
-            return Result;
-        }
+       
     }
 }

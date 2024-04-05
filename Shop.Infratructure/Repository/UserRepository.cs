@@ -19,14 +19,50 @@ namespace Shop.Infratructure.Repository
             _context = context;
         }
 
+        public async Task<User?> GetUserByIdAndRole(Guid id)
+        {
+            var result = await _context.Set<User>()
+                .Where(x => x.Id == id)
+                .AsNoTracking()
+                .Include(x => x.Role)
+                .FirstOrDefaultAsync();
+            
+            return result;
+        }
+
+        public Task<User?> GetUserByEmailAndRole(string? email)
+        {
+            var result = _context.Set<User>()
+                .Where(x => x.Email == email)
+                .Include(x=>x.Role)
+                .FirstOrDefaultAsync();
+            return result;
+        }
+
         public async Task<int> Count()
         {
            return await _context.Set<User>().CountAsync();   
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync(int page, int take)
+        public async Task<User?> GetInfoUserById(Guid id)
         {
-            var Result= await _context.Set<User>()
+            var user = await _context.Set<User>()
+                .Where(x => x.Id == id)
+                .Select(x => new User()
+                {
+                    Id = x.Id,
+                    FistName = x.FistName,
+                    LastName = x.LastName,
+                    FullName = x.FullName,
+                    Email = x.Email
+                }).FirstOrDefaultAsync();
+            return user;
+        }
+
+
+        public async Task<List<User>?> GetAllAsyncNoTracking(int page, int take)
+        {
+            var result= await _context.Set<User>()
                 .Skip((page - 1) * take)
                 .Take(take)
                 .AsNoTracking()
@@ -39,7 +75,7 @@ namespace Shop.Infratructure.Repository
                     Role = x.Role,
                 })
                 .ToListAsync();
-            return Result;
+            return result;
         }
     }
 }

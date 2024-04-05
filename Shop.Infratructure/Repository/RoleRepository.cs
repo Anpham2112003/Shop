@@ -1,6 +1,13 @@
-﻿namespace Shop.Infratructure.Repository;
+﻿using Shop.Domain.Entities;
+using Shop.Domain.Interfaces;
+using Shop.Infratructure.AplicatonDBcontext;
 
-public class RoleRepository
+namespace Shop.Infratructure.Repository;
+
+public class RoleRepository:GenericRepository<Role>,IRoleRepository<Role>
 {
-    
+    public RoleRepository(ApplicationDbContext context) : base(context)
+    {
+        
+    }
 }

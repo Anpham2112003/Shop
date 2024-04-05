@@ -1,6 +1,9 @@
-﻿namespace Shop.Domain.Interfaces;
+﻿using Shop.Domain.Abstraction;
+using Shop.Domain.Entities;
 
-public class IPaymentRepository
+namespace Shop.Domain.Interfaces;
+
+public interface IPaymentRepository<TEntity>:IGenericRepository<TEntity> where TEntity:class,BaseEntity
 {
     
 }

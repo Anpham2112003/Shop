@@ -5,12 +5,16 @@ using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Queries.UserQueries;
 
-public class GetInforUserById : IRequest<UserResponseModel?>
+public class GetInfoUserById : IRequest<UserResponseModel?>
 {
     public Guid Id { get; set; }
-    
+
+    public GetInfoUserById(Guid id)
+    {
+        Id = id;
+    }
 }
-public class HandGetUserById:IRequestHandler<GetInforUserById,UserResponseModel?>
+public class HandGetUserById:IRequestHandler<GetInfoUserById,UserResponseModel?>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
@@ -21,7 +25,7 @@ public class HandGetUserById:IRequestHandler<GetInforUserById,UserResponseModel?
         _mapper = mapper;
     }
 
-    public async Task<UserResponseModel?> Handle(GetInforUserById request, CancellationToken cancellationToken)
+    public async Task<UserResponseModel?> Handle(GetInfoUserById request, CancellationToken cancellationToken)
     {
         try
         {

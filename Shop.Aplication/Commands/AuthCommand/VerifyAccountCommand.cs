@@ -4,17 +4,16 @@ using System.Text;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Shop.Aplication.ResultOrError;
 using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands;
 
-public class VerifyAccountCommand:IRequest<IResult<Object>>
+public class VerifyAccountCommand:IRequest<bool>
 {
     public string? AccountToken { get; set; }
 }
 
-public class HandVerifyAccount : IRequestHandler<VerifyAccountCommand, IResult<object>>
+public class HandVerifyAccount : IRequestHandler<VerifyAccountCommand, bool>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IConfiguration _configuration;
@@ -25,25 +24,35 @@ public class HandVerifyAccount : IRequestHandler<VerifyAccountCommand, IResult<o
         _configuration = configuration;
     }
 
-    public async Task<IResult<Object>> Handle(VerifyAccountCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(VerifyAccountCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var validationToken = GetClaimsPrincipal(request.AccountToken);
-            var email = validationToken.FindFirstValue(ClaimTypes.Email);
-            if (email is null)
+            if (request.AccountToken != null)
             {
-                return new UnAuthorization<Object>("Token not valid");
+                var validationToken = GetClaimsPrincipal(request.AccountToken);
+                
+                var email = validationToken.FindFirstValue(ClaimTypes.Email);
+
+                if (email is null) return false;
+
+                var user = await _unitOfWork.userRepository.GetUserByEmailAndRole(email);
+                
+                if (user == null) return false;
+                
+                user.IsActive = true;
+                
+                await _unitOfWork.SaveChangesAsync();
+                
+                return true;
             }
 
-            var user = await _unitOfWork.userRepository.GetUserByEmail(email);
-            user.IsActive = true;
-             await _unitOfWork.SaveChangesAsync();
-            return new Ok<Object>("Success",new {});
+            return false;
+
         }
         catch (Exception e)
         {
-            return new ServerError<object>(e.Message);
+            throw new Exception(e.Message);
         }
     }
 

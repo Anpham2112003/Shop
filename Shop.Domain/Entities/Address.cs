@@ -1,7 +1,6 @@
 ﻿using Shop.Domain.Abstraction;
-using Shop.Domain.Entities;
 
-namespace Shop.Domain.Interfaces;
+namespace Shop.Domain.Entities;
 
 public class Address:BaseEntity
 {
@@ -13,7 +12,8 @@ public class Address:BaseEntity
     public string? City { get; set; }
     
     public Guid UserId { get; set; }
-    
-    
+        
     public User? User { get; set; }
+    
+   
 }

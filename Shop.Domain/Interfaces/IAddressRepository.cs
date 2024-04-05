@@ -1,6 +1,9 @@
-﻿namespace Shop.Domain.Interfaces;
+﻿using Shop.Domain.Abstraction;
+using Shop.Domain.Entities;
 
-public class IAddressRepository
+namespace Shop.Domain.Interfaces;
+
+public interface IAddressRepository<TEntity>:IGenericRepository<TEntity> where TEntity:class,BaseEntity
 {
-    
+    Task<List<TEntity>> GetAddressByUserId(Guid id);
 }

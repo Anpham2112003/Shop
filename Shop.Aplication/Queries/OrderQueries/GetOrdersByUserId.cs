@@ -5,7 +5,7 @@ using StackExchange.Redis;
 
 namespace Shop.Aplication.Queries.OrderQueries;
 
-public class GetOrdersSuccess:IRequest<PagingResponseModel<List<OrderSuccessResponseModel>>?>
+public class GetOrdersByUserId:IRequest<PagingResponseModel<List<OrderSuccessResponseModel>>?>
 {
     public Guid UserId { get; set; }
     
@@ -13,7 +13,7 @@ public class GetOrdersSuccess:IRequest<PagingResponseModel<List<OrderSuccessResp
     
     public int Take { get; set; }
 
-    public GetOrdersSuccess(Guid userId, int page, int take)
+    public GetOrdersByUserId(Guid userId, int page, int take)
     {
         UserId = userId;
         Page = page;
@@ -21,7 +21,7 @@ public class GetOrdersSuccess:IRequest<PagingResponseModel<List<OrderSuccessResp
     }
 }
 
-public class HandGetOrderSuccess:IRequestHandler<GetOrdersSuccess,PagingResponseModel<List<OrderSuccessResponseModel>>?>
+public class HandGetOrderSuccess:IRequestHandler<GetOrdersByUserId,PagingResponseModel<List<OrderSuccessResponseModel>>?>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -30,12 +30,12 @@ public class HandGetOrderSuccess:IRequestHandler<GetOrdersSuccess,PagingResponse
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<PagingResponseModel<List<OrderSuccessResponseModel>>?> Handle(GetOrdersSuccess request, CancellationToken cancellationToken)
+    public async Task<PagingResponseModel<List<OrderSuccessResponseModel>>?> Handle(GetOrdersByUserId request, CancellationToken cancellationToken)
     {
         var result =
-            await _unitOfWork.orderRepository.GetOrderSuccessUserId(request.UserId, request.Page, request.Take);
+            await _unitOfWork.orderRepository.GetOrderByUserId(request.UserId, request.Page, request.Take);
 
-        var total = await _unitOfWork.orderRepository.CountOrderSuccessByIdUser(request.UserId);
+        var total = await _unitOfWork.orderRepository.CountOrderIdUser(request.UserId);
         
         
         if (result.Any())

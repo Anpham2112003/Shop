@@ -1,3 +1,8 @@
-﻿namespace Shop.Domain.Interfaces;
+﻿using Shop.Domain.Abstraction;
 
-public record IShipRepository();
+namespace Shop.Domain.Interfaces;
+
+public interface IShipRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class, BaseEntity
+{
+    
+}

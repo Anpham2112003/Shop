@@ -10,7 +10,7 @@ namespace Shop.Domain.Interfaces
 {
     public interface ICategoryRepository<Entity>:IGenericRepository<Entity> where Entity : class,BaseEntity
     {
-        public Task<IEnumerable<Category>> GetProductsByCategoryId(Guid Id,int page,int take);
+        
         public Task<int> CountAsync();
     }
 }

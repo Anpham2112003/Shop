@@ -18,19 +18,26 @@ namespace Shop.Infratructure.Repository
             _context = context;
         }
 
+        public async Task<int> CountCommentByProductId(Guid id)
+        {
+            var result = await _context.Set<Comment>().Where(x => x.ProductId == id).AsNoTracking().CountAsync();
+            
+            return result;
+        }
+
         public Task<int> Count()
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Comment>> GetCommentByProductId(Guid id, int page, int take)
+        public async Task<List<Comment>> GetCommentByProductId(Guid id, int page, int take)
         {
-            var Result= await _context.Set<Comment>()
+            var result= await _context.Set<Comment>()
                 .Where(x=>x.ProductId==id)
                 .Skip((page-1)*take)
                 .Take(take)
                 .ToListAsync();
-            return Result;
+            return result;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Shop.Aplication.Commands.PaymentCommand;
 
-public class PaymentConmand
+public class PaymentCommand
 {
-    
+    public Guid Id { get; set; }
 }

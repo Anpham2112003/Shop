@@ -4,7 +4,7 @@
 
 namespace Shop.Infratructure.Migrations
 {
-    public partial class ChangeTableOrder : Migration
+    public partial class addSomeTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

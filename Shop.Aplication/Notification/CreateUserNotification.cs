@@ -10,9 +10,9 @@ using Shop.Infratructure.Services;
 
 namespace Shop.Aplication.Notify;
 
-public class CreateUserNotify:INotification
+public class CreateUserNotification:INotification
 {
-    public CreateUserNotify(CreateUserCommand userCommand)
+    public CreateUserNotification(CreateUserCommand userCommand)
     {
         UserCommand = userCommand;
     }
@@ -20,7 +20,7 @@ public class CreateUserNotify:INotification
     public CreateUserCommand UserCommand { get; set; }
 }
 
-public class HandCreateUserNotify : INotificationHandler<CreateUserNotify>
+public class HandCreateUserNotify : INotificationHandler<CreateUserNotification>
 {
   
     private readonly IMailerSeverive _mailerService;
@@ -32,11 +32,14 @@ public class HandCreateUserNotify : INotificationHandler<CreateUserNotify>
         _configuration = configuration;
     }
 
-    public async Task Handle(CreateUserNotify notification, CancellationToken cancellationToken)
+    public async Task Handle(CreateUserNotification notification, CancellationToken cancellationToken)
     {
             var token = await GenerateToken(notification.UserCommand);
+
             await _mailerService.SendMail(notification.UserCommand.Email, "Xac minh tai khoan",
             EmailTemplate.VerifyEmail(token));
+
+            await Task.CompletedTask;
     }
     
 

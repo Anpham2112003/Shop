@@ -1,6 +1,8 @@
-﻿namespace Shop.Domain.Enum;
+﻿namespace Shop.Domain.Enums;
 
 public enum ShipState
 {
-    
+    Waiting,
+    Shipping,
+    Success
 }

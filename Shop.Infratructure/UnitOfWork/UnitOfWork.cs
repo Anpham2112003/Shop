@@ -95,18 +95,7 @@ namespace Shop.Infratructure.UnitOfWork
             }
         }
 
-        private IProductCategoryRepository<ProductCategory> ProductCategoryRepository;
-        public IProductCategoryRepository<ProductCategory> productCategoryRepository
-        {
-            get
-            {
-                if(ProductCategoryRepository == null)
-                {
-                    ProductCategoryRepository= new ProductCategoryRepository(_context);
-                }
-                return ProductCategoryRepository;
-            }
-        }
+       
         private IOrderRepository<Order> OrderRepository;
         public IOrderRepository<Order> orderRepository
         {
@@ -132,15 +121,73 @@ namespace Shop.Infratructure.UnitOfWork
             }
         }
 
+        private IRoleRepository<Role> RoleRepository;
+
+        public IRoleRepository<Role> roleRepository
+        {
+            get
+            {
+                if (RoleRepository == null)
+                {
+                    RoleRepository = new RoleRepository(_context);
+                }
+
+                return RoleRepository;
+            }
+        }
+
+        private IShipRepository<Ship> ShipRepository;
+
+        public IShipRepository<Ship> shipRepository
+        {
+            get
+            {
+                if (ShipRepository == null)
+                {
+                    ShipRepository = new ShipRepository(_context);
+                }
+
+                return ShipRepository;
+            }
+        }
+
+        private IAddressRepository<Address> AddressRepository;
+
+        public IAddressRepository<Address> addressRepository
+        {
+            get
+            {
+                if (AddressRepository == null)
+                {
+                    AddressRepository = new AddressRepository(_context);
+                }
+
+                return AddressRepository;
+            }
+        }
+
+        private IPaymentRepository<Payment> PaymentRepository;
+
+        public IPaymentRepository<Payment> paymentRepository
+        {
+            get
+            {
+                if (PaymentRepository == null)
+                {
+                    PaymentRepository = new PaymentRepository(_context);
+                }
+
+                return PaymentRepository;
+            }
+        }
+
+
         public void Dispose()
         {
             
         }
 
-        public int SaveChanges()
-        {
-           return _context.SaveChanges();
-        }
+        
         public async Task<int> SaveChangesAsync()
         {
           return await _context.SaveChangesAsync();

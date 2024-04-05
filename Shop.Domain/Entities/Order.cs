@@ -3,26 +3,39 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Shop.Domain.Enum;
 
 namespace Shop.Domain.Entities
 {
     public class Order : BaseEntity
     {
         public Guid Id { get; set; }
-        public string? UserName {  get; set; }
-        public string? Address { get; set; }
-        public string? Phonenumber { get; set; }
-        public string? Email {  get; set; }
+        
+        public string? Name { get; set; }
         public int Quantity { get; set; }
         public double TotalPrice { get; set;}
-        public bool IsPayment {  get; set; }
-        public string? PaymentMethod {  get; set; }
-        public bool OrderState {  get; set; }
+        public string? ImageUrl { get; set; }
+        
         public Guid UserId { get; set; }
-        public User? User { get; set; }
-        public Guid? ProductFK { get; set; }
+        
+        public Guid ProductId { get; set; }
+
+        public bool OrderState { get; set; }
+        
+        public PaymentMethod PaymentMethod { get; set; }
+        
+        [JsonIgnore]
         public Product? Product { get; set; }
+
+        [JsonIgnore]
+        public User? User { get; set; }
+        
+        
+        public Payment? Payment { get; set; }
+        
+        public Ship? Ship { get; set; }
 
     }
 }

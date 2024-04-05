@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using MediatR;
-using Shop.Aplication.ResultOrError;
 using Shop.Domain.Entities;
 using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands;
 
-public class UpdateUserCommand:IRequest<IResult<UpdateUserCommand>>
+public class UpdateUserCommand:IRequest<bool>
 {
     public Guid Id { get; set; }
     public string? FistName { get; set; }
@@ -28,7 +27,7 @@ public class UpdateUserCommand:IRequest<IResult<UpdateUserCommand>>
     
 }
 
-public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, IResult<UpdateUserCommand>>
+public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, bool>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
@@ -39,24 +38,24 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, IResu
         _mapper = mapper;
     }
 
-    public async Task<IResult<UpdateUserCommand>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
-        var finduser = await _unitOfWork.userRepository.FindByIdAsync(request.Id);
-        // find user by id
-        if (finduser is null) return new NotFound<UpdateUserCommand>("Not found User by Id = " + request.Id);
-        // check if user is ull return NotFound
 
         try
         {
-           var user= _mapper.Map<UpdateUserCommand,User>(request,finduser);
-           // map data UpdateUserCommand to variable finduser;
+            var findUser = await _unitOfWork.userRepository.FindByIdAsync(request.Id);
+            // find user by id
+            if (findUser is null) return false;
+            // check if user is ull return NotFound
+           var user= _mapper.Map<UpdateUserCommand,User>(request,findUser);
+           // map data UpdateUserCommand to variable findUser;
            _unitOfWork.userRepository.Update(user);
           await _unitOfWork.SaveChangesAsync();// commit data to database
-          return new Ok<UpdateUserCommand>("Success", request); 
+          return true;
         }
         catch (Exception ex )
         {
-            return new ServerError<UpdateUserCommand>("Cant update user because server error  "+ex.Message);
+            throw new Exception(ex.Message);
         }
     }
 }

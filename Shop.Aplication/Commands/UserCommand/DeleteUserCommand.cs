@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Shop.Aplication.ResultOrError;
 using Shop.Infratructure.UnitOfWork;
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Shop.Aplication.Commands
 {
-    public class DeleteUserCommand:IRequest<IResult<DeleteUserCommand>>
+    public class DeleteUserCommand:IRequest<bool>
     {
         public Guid Id { get; set; }
         public DeleteUserCommand(Guid id)
@@ -20,7 +19,7 @@ namespace Shop.Aplication.Commands
    
     }
 
-    public class HandDeleteUserCommand : IRequestHandler<DeleteUserCommand, IResult<DeleteUserCommand>>
+    public class HandDeleteUserCommand : IRequestHandler<DeleteUserCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -29,26 +28,26 @@ namespace Shop.Aplication.Commands
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IResult<DeleteUserCommand>> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
             
 
             try
             {
-                var user = await _unitOfWork.userRepository.GetByIdAsync(request.Id);
+                var user = await _unitOfWork.userRepository.FindByIdAsync(request.Id);
 
-                if (user == null) return new NotFound<DeleteUserCommand>("Cant not delete user because not found UserId= " + request.Id);
+                if (user == null) return false;
                 
 
                 _unitOfWork.userRepository.Remove(user);
                 await _unitOfWork.SaveChangesAsync();
-                return new Ok<DeleteUserCommand>("success",request);
+                return true;
 
             }
             catch (Exception ex)
             {
-                return new ServerError<DeleteUserCommand>("Server error! " + ex);
-                
+                throw new Exception(ex.Message);
+
             }
         }
     }

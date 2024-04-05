@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Shop.Domain.Entities
@@ -16,7 +17,11 @@ namespace Shop.Domain.Entities
         public double TotalPrice { get; set; }
         public string? ImageUrl {  get; set; }
         public Guid UserId { get; set; }
+        
+        [JsonIgnore]
         public User? User { get; set; }
+        
+        [JsonIgnore]
         public Product? Product { get; set; }
        
     }

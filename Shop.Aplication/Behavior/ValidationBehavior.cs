@@ -2,13 +2,14 @@
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 
 namespace Shop.Aplication.Validation;
 
-public class ValidationBehavior< TRequest,TResponse>:IPipelineBehavior<TRequest,TResponse>
+public class ValidationBehavior< TRequest,TResponse>:IPipelineBehavior<TRequest,TResponse> where TRequest : class
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
-
+    
     public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
     {
         _validators = validators;
@@ -16,6 +17,7 @@ public class ValidationBehavior< TRequest,TResponse>:IPipelineBehavior<TRequest,
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
+        
         var context = new ValidationContext<TRequest>(request);
         var validation = _validators.Select(x => x.Validate(context));
         var errors = validation
@@ -28,6 +30,7 @@ public class ValidationBehavior< TRequest,TResponse>:IPipelineBehavior<TRequest,
         {
             throw new ValidationException(errors);
         }
+        
         
         return await next();
 

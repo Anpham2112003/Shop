@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using Shop.Domain.RequestModel;
+using Shop.Aplication.Commands;
 
 namespace Shop.Aplication.Validation;
 
-public class CreateUserCommandValidation:AbstractValidator<CreateUserCommand>
+public class CreateUserValidation:AbstractValidator<CreateUserCommand>
 {
-    public CreateUserCommandValidation()
+    public CreateUserValidation()
     {
         RuleFor(x => x.Email)
             .NotEmpty()

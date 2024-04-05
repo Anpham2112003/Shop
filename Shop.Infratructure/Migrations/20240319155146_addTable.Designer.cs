@@ -12,14 +12,14 @@ using Shop.Infratructure.AplicatonDBcontext;
 namespace Shop.Infratructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240222075625_addTableRole")]
-    partial class addTableRole
+    [Migration("20240319155146_addTable")]
+    partial class addTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.26")
+                .HasAnnotation("ProductVersion", "6.0.28")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -108,6 +108,8 @@ namespace Shop.Infratructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Id");
+
                     b.HasIndex("ProductId");
 
                     b.HasIndex("UserId");
@@ -121,9 +123,6 @@ namespace Shop.Infratructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ColorImage")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -132,12 +131,48 @@ namespace Shop.Infratructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("Id");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique();
 
                     b.ToTable("Images");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Shop.Domain.Entities.OrderDetail", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -149,19 +184,19 @@ namespace Shop.Infratructure.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsPayment")
-                        .HasColumnType("bit");
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("OrderState")
-                        .HasColumnType("bit");
+                    b.Property<DateTime>("OrderAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentMethod")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Phonenumber")
+                    b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("ProductFK")
+                    b.Property<Guid?>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
@@ -178,13 +213,10 @@ namespace Shop.Infratructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductFK")
-                        .IsUnique()
-                        .HasFilter("[ProductFK] IS NOT NULL");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Orders");
+                    b.ToTable("OrderDetails");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.Product", b =>
@@ -197,31 +229,20 @@ namespace Shop.Infratructure.Migrations
                         .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<Guid?>("CategoryId")
+                        .IsRequired()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("DeletedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float?>("DisCount")
-                        .HasColumnType("real");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSale")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Price")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("PriceDisCount")
                         .HasColumnType("float");
 
                     b.Property<int>("Quantity")
@@ -234,28 +255,32 @@ namespace Shop.Infratructure.Migrations
 
                     b.HasIndex("BrandId");
 
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("Id");
+
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Shop.Domain.Entities.ProductCategory", b =>
+            modelBuilder.Entity("Shop.Domain.Entities.ProductTag", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CategoryId")
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid>("TagId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductCategories");
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ProductTags");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.Role", b =>
@@ -274,19 +299,35 @@ namespace Shop.Infratructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("dd883ca3-ff57-4bef-b1f0-d0af3024bd28"),
+                            Id = new Guid("943bf4c8-4feb-43aa-9e58-4d92485c0078"),
                             Name = "Admin"
                         },
                         new
                         {
-                            Id = new Guid("1b78fc5c-b3b5-463d-92ca-1b3e062464b7"),
+                            Id = new Guid("b025ad27-3ad6-4fc7-9c50-2ec0b46f1d3b"),
                             Name = "Manager"
                         },
                         new
                         {
-                            Id = new Guid("ad2814c9-b638-4a0f-8d0a-745fba8732bb"),
+                            Id = new Guid("c1bb2db4-a327-431f-9d7b-5122d6e17c28"),
                             Name = "User"
                         });
+                });
+
+            modelBuilder.Entity("Shop.Domain.Entities.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TagName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.User", b =>
@@ -310,6 +351,9 @@ namespace Shop.Infratructure.Migrations
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -319,9 +363,6 @@ namespace Shop.Infratructure.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Refreshtoken")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
@@ -329,6 +370,8 @@ namespace Shop.Infratructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Id");
 
                     b.HasIndex("RoleId");
 
@@ -376,8 +419,8 @@ namespace Shop.Infratructure.Migrations
             modelBuilder.Entity("Shop.Domain.Entities.Image", b =>
                 {
                     b.HasOne("Shop.Domain.Entities.Product", "Product")
-                        .WithMany("Images")
-                        .HasForeignKey("ProductId")
+                        .WithOne("Image")
+                        .HasForeignKey("Shop.Domain.Entities.Image", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -388,8 +431,10 @@ namespace Shop.Infratructure.Migrations
                 {
                     b.HasOne("Shop.Domain.Entities.Product", "Product")
                         .WithOne("Order")
-                        .HasForeignKey("Shop.Domain.Entities.Order", "ProductFK")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("Shop.Domain.Entities.Order", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("order-product");
 
                     b.HasOne("Shop.Domain.Entities.User", "User")
                         .WithMany("Orders")
@@ -402,6 +447,17 @@ namespace Shop.Infratructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Shop.Domain.Entities.OrderDetail", b =>
+                {
+                    b.HasOne("Shop.Domain.Entities.User", "User")
+                        .WithOne("OrderDetail")
+                        .HasForeignKey("Shop.Domain.Entities.OrderDetail", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Shop.Domain.Entities.Product", b =>
                 {
                     b.HasOne("Shop.Domain.Entities.Brand", "Brand")
@@ -410,26 +466,33 @@ namespace Shop.Infratructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Brand");
-                });
-
-            modelBuilder.Entity("Shop.Domain.Entities.ProductCategory", b =>
-                {
                     b.HasOne("Shop.Domain.Entities.Category", "Category")
-                        .WithMany("ProductCategories")
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Brand");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Shop.Domain.Entities.ProductTag", b =>
+                {
                     b.HasOne("Shop.Domain.Entities.Product", "Product")
-                        .WithMany("ProductCategories")
+                        .WithMany("ProductTags")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
+                    b.HasOne("Shop.Domain.Entities.Tag", "Tag")
+                        .WithMany("ProductTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Product");
+
+                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.User", b =>
@@ -450,7 +513,7 @@ namespace Shop.Infratructure.Migrations
 
             modelBuilder.Entity("Shop.Domain.Entities.Category", b =>
                 {
-                    b.Navigation("ProductCategories");
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.Product", b =>
@@ -459,11 +522,11 @@ namespace Shop.Infratructure.Migrations
 
                     b.Navigation("Comments");
 
-                    b.Navigation("Images");
+                    b.Navigation("Image");
 
                     b.Navigation("Order");
 
-                    b.Navigation("ProductCategories");
+                    b.Navigation("ProductTags");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.Role", b =>
@@ -471,11 +534,18 @@ namespace Shop.Infratructure.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("Shop.Domain.Entities.Tag", b =>
+                {
+                    b.Navigation("ProductTags");
+                });
+
             modelBuilder.Entity("Shop.Domain.Entities.User", b =>
                 {
                     b.Navigation("Carts");
 
                     b.Navigation("Comments");
+
+                    b.Navigation("OrderDetail");
 
                     b.Navigation("Orders");
                 });

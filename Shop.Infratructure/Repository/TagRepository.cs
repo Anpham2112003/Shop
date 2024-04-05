@@ -1,6 +1,13 @@
-﻿namespace Shop.Infratructure.Repository;
+﻿using Shop.Domain.Entities;
+using Shop.Domain.Interfaces;
+using Shop.Infratructure.AplicatonDBcontext;
 
-public class TagRepository
+namespace Shop.Infratructure.Repository;
+
+public class TagRepository:GenericRepository<Tag>
 {
-    
+    protected TagRepository(ApplicationDbContext context) : base(context)
+    {
+        
+    }
 }

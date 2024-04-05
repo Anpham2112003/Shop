@@ -1,6 +1,15 @@
-﻿namespace Shop.Infratructure.Repository;
+﻿using Shop.Domain.Entities;
+using Shop.Domain.Interfaces;
+using Shop.Infratructure.AplicatonDBcontext;
 
-public class ShipRepository
+namespace Shop.Infratructure.Repository;
+
+public class ShipRepository:GenericRepository<Ship>,IShipRepository<Ship>
 {
-    
+    private readonly ApplicationDbContext _context;
+
+    public ShipRepository(ApplicationDbContext context) : base(context)
+    {
+        _context = context;
+    }
 }

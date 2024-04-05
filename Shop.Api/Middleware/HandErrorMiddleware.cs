@@ -1,7 +1,7 @@
 ﻿
 using FluentValidation;
 
-namespace Shop.Api.HandlerMiddware
+namespace Shop.Api.Middleware
 {
     public class HandErrorMiddleware : IMiddleware
     {

@@ -18,10 +18,10 @@ namespace Shop.Infratructure.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Image>> GetImageByProductId(Guid id)
+        public async Task<List<Image>> GetImageByProductId(Guid id)
         {
-            var Result= await _context.Set<Image>().Where(x=>x.ProductId==id).ToListAsync();
-            return Result;
+            var result= await _context.Set<Image>().Where(x=>x.ProductId==id).ToListAsync();
+            return result;
         }
     }
 }

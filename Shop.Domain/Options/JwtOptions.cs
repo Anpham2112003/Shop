@@ -1,6 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿
 
-namespace Shop.Api.Auth
+namespace Shop.Domain.Options
 {
     public class JwtOptions
     {
@@ -12,6 +12,8 @@ namespace Shop.Api.Auth
         public string? IssuerSigningKey {  get; set; }
         public string? ValidAudience { get; set; }
         public string? ValidIssuer { get; set; }
+        
+        public string? RefreshKey { get; set; }
 
     }
 }

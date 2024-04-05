@@ -1,6 +1,6 @@
 ﻿namespace Shop.Domain.Enum;
 
-public enum Payment
+public enum PaymentMethod
 {
     VnPay,
     MoMo,

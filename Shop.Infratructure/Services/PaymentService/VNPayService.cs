@@ -11,11 +11,11 @@ using VNPAY_CS_ASPX;
 
 namespace Shop.Infratructure.Services.VnPaySevice;
 
-public class VnPay:IVnPayService
+public class VNPayService:IVnPayService
 {
     private readonly IOptions<VnPayOptions> _options;
-    private VnPayLibrary _vnPayLibrary = new VnPayLibrary();
-    public VnPay(IOptions<VnPayOptions> options)
+    private readonly VnPayLibrary _vnPayLibrary = new VnPayLibrary();
+    public VNPayService(IOptions<VnPayOptions> options)
     {
         _options = options;
     }

@@ -1,10 +1,9 @@
 ﻿using MediatR;
-using Shop.Aplication.ResultOrError;
 using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands;
 
-public class ChangePasswordCommand:IRequest<IResult<Object>>
+public class ChangePasswordCommand:IRequest<bool>
 {
     public string? Email { get; set; }
     public string? OldPassword { get; set; }
@@ -12,7 +11,7 @@ public class ChangePasswordCommand:IRequest<IResult<Object>>
     
 }
 
-public class HandChangePasswordCommand : IRequestHandler<ChangePasswordCommand, IResult<Object>>
+public class HandChangePasswordCommand : IRequestHandler<ChangePasswordCommand, bool>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -21,23 +20,23 @@ public class HandChangePasswordCommand : IRequestHandler<ChangePasswordCommand, 
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<IResult<object>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var user = await _unitOfWork.userRepository.GetUserByEmail(request.Email);
-        
-            if (user is null || user.Password.Equals(request.OldPassword)) return new NotFound<object>("User not exits");
+            var user = await _unitOfWork.userRepository.GetUserByEmailAndRole(request.Email);
+
+            if (user is null || user.Password!=request.OldPassword) return false;
 
             user.Password = request.NewPassword;
         
             await _unitOfWork.SaveChangesAsync();
 
-            return new Ok<object>("success", new { });
+            return true;
         }
         catch (Exception e)
         {
-            return new ServerError<object>(e.Message);
+            throw new Exception(e.Message);
         }
         
 

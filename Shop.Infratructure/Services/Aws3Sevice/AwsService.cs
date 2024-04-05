@@ -8,13 +8,13 @@ using Amazon.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Shop.Infratructure.Services.Aws3Sevice;
+namespace Shop.Infratructure.Services.Aws3Service;
 
-public class AwsSevice:IAwsSevice
+public class AwsService:IAwsSevice
 {
     private readonly IAmazonS3 _amazonS3;
 
-    public AwsSevice(IAmazonS3 amazonS3)
+    public AwsService(IAmazonS3 amazonS3)
     {
         _amazonS3 = amazonS3;
     }

@@ -2,9 +2,9 @@
 using Shop.Domain.Entities;
 using Shop.Infratructure.UnitOfWork;
 
-namespace Shop.Aplication.Queries.AddressQueies;
+namespace Shop.Aplication.Queries;
 
-public class GetAddressByUserId:IRequest<Address?>
+public class GetAddressByUserId:IRequest<List<Address>>
 {
     public Guid Id { get; set; }
 
@@ -14,7 +14,7 @@ public class GetAddressByUserId:IRequest<Address?>
     }
 }
 
-public class HandGetAddressByUserId:IRequestHandler<GetAddressByUserId,Address?>
+public class HandGetAddressByUserId:IRequestHandler<GetAddressByUserId,List<Address>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -23,13 +23,12 @@ public class HandGetAddressByUserId:IRequestHandler<GetAddressByUserId,Address?>
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Address?> Handle(GetAddressByUserId request, CancellationToken cancellationToken)
+    public async Task<List<Address>> Handle(GetAddressByUserId request, CancellationToken cancellationToken)
     {
         try
         {
             var address = await _unitOfWork.addressRepository.GetAddressByUserId(request.Id);
-
-            if (address is null) return null;
+ 
 
             return address;
         }

@@ -6,7 +6,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Shop.Aplication.ResultOrError;
 using Shop.Domain.Entities;
 using Shop.Domain.Options;
 using Shop.Domain.ResponseModel;
@@ -15,7 +14,7 @@ using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands;
 
-public class ReFreshTokenCommand:IRequest<IResult<LoginResponseModel>>
+public class ReFreshTokenCommand:IRequest<LoginResponseModel?>
 {
     public string? Token { get; set; }
 
@@ -30,7 +29,7 @@ public class ReFreshTokenCommand:IRequest<IResult<LoginResponseModel>>
     }
 }
 
-public class HandReFreshTokenCommand : IRequestHandler<ReFreshTokenCommand, IResult<LoginResponseModel>>
+public class HandReFreshTokenCommand : IRequestHandler<ReFreshTokenCommand, LoginResponseModel?>
 {
     private readonly IOptions<JwtOptions> _options;
     private readonly IRedisService _redis;
@@ -41,7 +40,7 @@ public class HandReFreshTokenCommand : IRequestHandler<ReFreshTokenCommand, IRes
         _redis = redis;
     }
 
-    public async Task<IResult<LoginResponseModel>> Handle(ReFreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<LoginResponseModel?> Handle(ReFreshTokenCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -54,7 +53,7 @@ public class HandReFreshTokenCommand : IRequestHandler<ReFreshTokenCommand, IRes
                 string? userId = validateResult.FindFirstValue("UserId");
                 var token = await _redis.GetCacheAsync(userId,cancellationToken);
                 // get token from redis if token is null return token expire
-                if (string.IsNullOrEmpty(token)) return new UnAuthorization<LoginResponseModel>("Token expire");
+                if (string.IsNullOrEmpty(token)) return null;
                 // check token 
                
                 //decodeToken get information
@@ -68,15 +67,15 @@ public class HandReFreshTokenCommand : IRequestHandler<ReFreshTokenCommand, IRes
                 await _redis.SetCacheAsync(userId, refreshToken, DateTime.UtcNow.AddDays(7), cancellationToken);
                 //set cache to redis
 
-                return new Ok<LoginResponseModel>("success", new LoginResponseModel(accessToken, refreshToken));
+                return  new LoginResponseModel(accessToken, refreshToken);
 
             }
 
-            return new UnAuthorization<LoginResponseModel>("Token not valid");
+            return null;
         }
         catch (Exception e)
         {
-            return new ServerError<LoginResponseModel>(e.Message);
+            throw new Exception(e.Message);
         }
     }
 

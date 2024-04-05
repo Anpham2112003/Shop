@@ -10,7 +10,7 @@ public class ProductResponseModel
     public int Quantity { get; set; }
     public Image? Image { get; set; }
     public Brand? Brand { get; set; }
+
     
-    public int Total { get; set; }
 
 }

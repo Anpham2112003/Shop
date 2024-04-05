@@ -23,17 +23,11 @@ namespace Shop.Infratructure.Repository
            return await _context.Set<Brand>().CountAsync();
         }
 
-        public async Task<IEnumerable<Brand>> GetProductByBrandId(Guid Id, int page, int take)
+        public async Task<List<Brand>> GetAllBrand( int page, int take)
         {
-            var Result= await _context.Set<Brand>()
-                .Where(x=>x.Id==Id)
-                .AsNoTracking()
-                .Include(x=>x.Products)
-                !.ThenInclude(x=>x.Images)
-                .Skip((page-1)*take).Take(take)
-                .ToListAsync();  
-
-            return Result;
+            var brands = await _context.Set<Brand>().Skip((page - 1) * take).Take(take).ToListAsync();
+            
+            return brands;
         }
     }
 }

@@ -4,13 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shop.Domain.Entities;
+using Shop.Domain.ResponseModel;
 
 namespace Shop.Domain.Interfaces
 {
-    public interface IOrderRepository<Entity>:IGenericRepository<Entity> where Entity : class,BaseEntity
+    public interface IOrderRepository<TEntity>:IGenericRepository<TEntity> where TEntity : class,BaseEntity
     {
-        Task<IEnumerable<Entity>> GetOrderIsPaymentByUserId(Guid Id, int page, int take);
-        Task<IEnumerable<Entity>> GetOrderNoPaymentByUserId(Guid Id, int page, int take);
-        Task<int> CountAsync();
+        Task<List<Order>> GetOrderNoPaymentByUserId(Guid id, int page, int take);
+
+        Task<List<OrderSuccessResponseModel>> GetOrderByUserId(Guid id, int page, int take);
+
+        Task<Order?> GetOrderDetail(Guid id);
+        Task<int> CountOrderIdUser(Guid id);
+        
     }
 }

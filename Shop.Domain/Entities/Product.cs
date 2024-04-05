@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Shop.Domain.Entities
@@ -20,24 +21,33 @@ namespace Shop.Domain.Entities
         public string? Description { get;set;}
 
         public Guid? BrandId { get;set;}
-        public Brand? Brand { get;set;}
-        public bool IsSale {  get;set;}
-        public float? DisCount {  get;set;}
-        public double? PriceDisCount {  get;set;}
+        
+        public Guid? CategoryId { get; set; }
         public  DateTime CreatedAt { get;set;}
 
         public DateTime? UpdatedAt { get;set;}
+        
+        public Brand? Brand { get;set;}
+        
+        public Category? Category { get; set; }
 
-        public bool IsDeleted { get;set;}
+        public Order? Order { get; set; }
 
-        public DateTime? DeletedAt {  get;set;}  
-
-        public ICollection<ProductCategory>? ProductCategories { get; set;}
-        public ICollection<Image>? Images { get; set; }
+        [JsonIgnore]
+        public Image? Image { get; set; }
+        
+        [JsonIgnore]
         public ICollection<Cart>? Carts { get; set;} 
+        
+        [JsonIgnore]
 
         public ICollection<Comment>? Comments { get; set; }
-        public Order? Order { get; set;} 
+        
+        [JsonIgnore]
+        public ICollection<ProductTag>? ProductTags { get; set; }
+        
+        
+       
        
 
     }

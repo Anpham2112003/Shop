@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
-using Shop.Aplication.ResultOrError;
 using Shop.Domain.Entities;
 using Shop.Domain.ResponseModel;
 using Shop.Infratructure.UnitOfWork;
@@ -17,7 +16,7 @@ using Shop.Infratructure.Services.RedisService;
 
 namespace Shop.Aplication.Commands
 {
-    public class LoginUserCommand:IRequest<IResult<LoginResponseModel>>
+    public class LoginUserCommand:IRequest<LoginResponseModel?>
     {
         public string? Email { get; set; }
         public string? Password { get; set; }
@@ -33,7 +32,7 @@ namespace Shop.Aplication.Commands
         }
     }
 
-    public class HandLoginUserCommand : IRequestHandler<LoginUserCommand, IResult<LoginResponseModel>>
+    public class HandLoginUserCommand : IRequestHandler<LoginUserCommand, LoginResponseModel?>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IOptions<JwtOptions> _optionsMonitor;
@@ -45,21 +44,27 @@ namespace Shop.Aplication.Commands
             _redis = redis;
         }
 
-        public async Task<IResult<LoginResponseModel>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task<LoginResponseModel?> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await  _unitOfWork.userRepository.GetUserByEmail(request.Email);
+            var user = await  _unitOfWork.userRepository.GetUserByEmailAndRole(request.Email);
             // find user by Email
 
-            if (user == null || user.Password != request.Password) return new UnAuthorization<LoginResponseModel>("Unauthorized");
+            if (user == null || user.Password != request.Password) return null;
             //check user is null or password not equals return Unauthorization;
+
+            var accessToken =await 
+                GenerateToken(user, user.Role.Name, _optionsMonitor.Value.IssuerSigningKey, DateTime.UtcNow.AddMinutes(1));
+
+            var refreshToken = await 
+                GenerateToken(user, user.Role.Name, _optionsMonitor.Value.RefreshKey, DateTime.UtcNow.AddDays(7));
             
-            string accessToken= await GenerateToken(user,user.Role.Name,_optionsMonitor.Value.IssuerSigningKey,DateTime.UtcNow.AddMinutes(1));
-            //Gennerate Accesstoken and RefreshToken
-            string refreshToken=await GenerateToken(user,user.Role.Name,_optionsMonitor.Value.RefreshKey,DateTime.UtcNow.AddDays(7));
+            
+            //Generate Access-token and RefreshToken
+            
 
             await _redis.SetCacheAsync(user.Id.ToString(), refreshToken, DateTime.UtcNow.AddDays(7), cancellationToken);
             //save refreshToken to redis
-            return new Ok<LoginResponseModel>("success", new LoginResponseModel(accessToken, refreshToken));
+            return  new LoginResponseModel(accessToken, refreshToken);
             //return AccessToken and RefreshToken for User
 
         }
