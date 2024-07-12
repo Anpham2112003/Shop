@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using Shop.Domain.Ultils;
 using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands.AddressCommand;
@@ -17,11 +19,12 @@ public class HandUpdateAddressCommand:IRequestHandler<UpdateAddressCommand,bool>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    
-    public HandUpdateAddressCommand(IUnitOfWork unitOfWork, IMapper mapper)
+    private readonly IHttpContextAccessor _contextAccessor;
+    public HandUpdateAddressCommand(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor contextAccessor)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _contextAccessor = contextAccessor;
     }
 
     public async Task<bool> Handle(UpdateAddressCommand request, CancellationToken cancellationToken)
@@ -30,7 +33,9 @@ public class HandUpdateAddressCommand:IRequestHandler<UpdateAddressCommand,bool>
         {
             var address = await _unitOfWork.addressRepository.FindByIdAsync(request.Id);
 
-            if (address is null) return false;
+            var userId = Guid.Parse(_contextAccessor.HttpContext!.User.GetIdFromClaim()); 
+
+            if (address is null || address.UserId.Equals(userId) is false) return false;
             
             _mapper.Map(request, address);
         
@@ -40,9 +45,9 @@ public class HandUpdateAddressCommand:IRequestHandler<UpdateAddressCommand,bool>
 
             return true;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            Console.WriteLine(e);
+           
             throw;
         }
        

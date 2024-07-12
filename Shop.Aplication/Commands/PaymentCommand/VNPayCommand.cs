@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
+using Shop.Domain.Enum;
 using Shop.Infratructure.Services.PaymentService;
 using Shop.Infratructure.UnitOfWork;
 
@@ -35,7 +36,7 @@ public class HandVnPayCommand:IRequestHandler<VnPayCommand,string?>
         {
             var order = await _unitOfWork.orderRepository.FindByIdAsync(request.Id);
 
-            if (order is null) return null;
+            if (order is null || order.PaymentMethod.Equals(PaymentMethod.Cod)) return null;
 
             return _payService.GenerateUrl(order.TotalPrice, 
                 "Thanh toan hoa don:" + order.Id.ToString(),
@@ -44,7 +45,7 @@ public class HandVnPayCommand:IRequestHandler<VnPayCommand,string?>
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw new Exception(e.Message);
+            throw ;
         }
     }
 }

@@ -1,12 +1,15 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Shop.Aplication.Commands;
+using Shop.Aplication.Commands.AuthCommand;
 using Shop.Domain.ResponseModel;
 
 
 namespace Shop.Api.Controllers
 {
+    [ApiController]
     [Route("api/auth")]
     public class AuthController:ControllerBase
     {
@@ -19,9 +22,19 @@ namespace Shop.Api.Controllers
             this._logger = logger;
             _mediator = mediator;
         }
+
+        [HttpPost("signin")]
+        public async Task<IActionResult> CreateAccount (CreateAccountCommand command)
+        {
+            var result = await _mediator.Send(command);
+
+            if(result) return Ok();
+
+            return BadRequest();
+        }
         
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginUserCommand user)
+        public async Task<IActionResult> Login(LoginAccountCommand user)
         {
             var result = await _mediator.Send(user);
             
@@ -42,7 +55,7 @@ namespace Shop.Api.Controllers
         {
            var result= await _mediator.Send(new VerifyAccountCommand() { AccountToken = token });
            
-           return result ? Ok("success") : BadRequest("Token not valid or Expire!");
+           return result ? Ok("success") : BadRequest("Token not valid !");
         }
         
         [HttpPost("password/reset")]
@@ -68,7 +81,14 @@ namespace Shop.Api.Controllers
 
            return result ? Ok("success") : BadRequest();
         }
-        
 
+        [Authorize]
+        [HttpDelete("delete/{id:guid}")]
+        public async Task<IActionResult> DeleteUserById(Guid id)
+        {
+            var result = await _mediator.Send(new DeleteAccountCommand(id));
+
+            return result ? Ok(result) : BadRequest("Not found UserId =" + id);
+        }
     }
 }

@@ -17,10 +17,7 @@ namespace Shop.Aplication.Validation
                 .NotNull()
                 .NotEmpty();
 
-            RuleFor(x => x.ShipState)
-                .NotEmpty()
-                .NotNull()
-                .IsInEnum();
+          
 
             RuleFor(x => x.AddressId)
                 .NotEmpty()

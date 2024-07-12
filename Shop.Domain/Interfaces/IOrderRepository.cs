@@ -13,9 +13,9 @@ namespace Shop.Domain.Interfaces
     {
         Task<List<Order>> GetOrderNoPaymentByUserId(Guid id, int page, int take);
 
-        Task<List<OrderSuccessResponseModel>> GetOrderByUserId(Guid id, int page, int take);
+        Task<List<OrderResponseModel>> GetOrderByUserId(Guid id, int page, int take);
 
-        Task<Order?> GetOrderDetail(Guid id);
+        Task<OrderDetailResponseModel?> GetOrderDetail(Guid id);
         Task<int> CountOrderIdUser(Guid id);
         
     }

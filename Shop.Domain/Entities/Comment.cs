@@ -13,14 +13,12 @@ namespace Shop.Domain.Entities
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public Guid ProductId { get; set; }
-        public string? UserName {  get; set; }
         public string? Content {  get; set; }
         public int Rate {  get; set; }
         
-        [JsonIgnore]
+      
         public User? User { get; set; }
         
-        [JsonIgnore]
         public Product? Product { get; set; }
 
        

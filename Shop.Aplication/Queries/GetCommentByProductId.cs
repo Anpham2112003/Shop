@@ -5,23 +5,23 @@ using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Queries;
 
-public class GetCommentByProductId:IRequest<PagingResponseModel<List<Comment>>>
+public class GetCommentByProductId:IRequest<ScrollPageResponseModel<CommentResponseModel>>
 {
-    public GetCommentByProductId(Guid id, int page, int take)
+    public GetCommentByProductId(Guid id, int skip, int take)
     {
         Id = id;
-        Page = page;
+        Skip = skip;
         Take = take;
     }
 
     public Guid Id { get; set; }
     
-    public int Page { get; set; }
+    public int Skip { get; set; }
     
     public int Take { get; set; }
 }
 
-public class HandGetCommentByProductId : IRequestHandler<GetCommentByProductId,PagingResponseModel< List<Comment>>>
+public class HandGetCommentByProductId : IRequestHandler<GetCommentByProductId,ScrollPageResponseModel<CommentResponseModel>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -30,27 +30,27 @@ public class HandGetCommentByProductId : IRequestHandler<GetCommentByProductId,P
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<PagingResponseModel<List<Comment>>> Handle(GetCommentByProductId request, CancellationToken cancellationToken)
+    public async Task<ScrollPageResponseModel<CommentResponseModel>> Handle(GetCommentByProductId request, CancellationToken cancellationToken)
     {
         try
         {
             
-            var result = await _unitOfWork.commentRepository.GetCommentByProductId(request.Id, request.Page, request.Take);
-            
-            var total = await _unitOfWork.commentRepository.CountCommentByProductId(request.Id);
+            var result = await _unitOfWork.commentRepository.GetCommentByProductId(request.Id, request.Skip, request.Take);
 
-            return new PagingResponseModel<List<Comment>>()
+
+
+            return new ScrollPageResponseModel<CommentResponseModel>
             {
-                Message = "success",
-                Total = total,
                 Data = result,
+                skip = request.Skip,
+                take = request.Take
             };
 
             
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw;
         }
         
         

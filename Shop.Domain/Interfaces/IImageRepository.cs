@@ -10,7 +10,7 @@ namespace Shop.Domain.Interfaces
 {
      public interface IImageRepository<Entity>:IGenericRepository<Entity> where Entity : class,BaseEntity
     {
-        Task<List<Image>> GetImageByProductId(Guid id);
+       
         
     }
     

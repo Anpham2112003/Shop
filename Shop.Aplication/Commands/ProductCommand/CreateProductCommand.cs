@@ -18,6 +18,8 @@ public class CreateProductCommand:IRequest<CreateProductCommand>
     public string? Name{get;set;}
         
     public double Price{get;set;}
+    public bool IsDiscount { get;set;}
+    public double PriceDiscount { get;set;}
         
     public int Quantity{get;set;}
     
@@ -25,7 +27,6 @@ public class CreateProductCommand:IRequest<CreateProductCommand>
 
     public Guid BrandId { get;set;}
     
-    public Guid CategoryId { get; set; }
     
     public  DateTime CreatedAt =DateTime.UtcNow;
     
@@ -57,34 +58,28 @@ public class HandCreateProductCommand:IRequestHandler<CreateProductCommand,Creat
         try
         {
          
-            var random = new Random();
             var product = _mapper.Map<Product>(request);
             
-            StringBuilder imageKey = new StringBuilder();
-            imageKey.Append(request.Id);
-            imageKey.Append(random.NextInt64(1,1000000000000));
-            imageKey.Append("imageProduct.");
-            imageKey.Append(Path.GetExtension(request.Image.FileName));
-            
-            
-            await _awsSevice.Upload(request.Image, _configuration["AWS:Bucket"], imageKey.ToString(), cancellationToken);
-            
+            StringBuilder imageKey = new StringBuilder()
+                .Append(Guid.NewGuid().ToString())
+                .Append(Path.GetExtension(request.Image!.FileName));
+
+
+            await _awsSevice.Upload(request.Image, _configuration["AWS:Bucket"]!, imageKey.ToString(), cancellationToken);
+
             await _unitOfWork.productRepository.AddAsync(product);
             
-            await _unitOfWork.imageRepository.AddAsync(new Image(Guid.NewGuid(),imageKey.ToString(),request.Id ));
+            await _unitOfWork.imageRepository.AddAsync(new Image(Guid.NewGuid(), _configuration["Aws:Url"] + imageKey.ToString(),request.Id ));
             
             await _unitOfWork.SaveChangesAsync();
-            
-            
-
             
 
             return request;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            
-           throw new Exception(e.Message);
+
+            throw;
         }
        
 

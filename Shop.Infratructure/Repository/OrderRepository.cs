@@ -18,7 +18,7 @@ namespace Shop.Infratructure.Repository
         public async Task<List<Order>> GetOrderNoPaymentByUserId(Guid id, int page, int take)
         {
             var orders = await _context.Set<Order>()
-                .Where(x => x.Id == id&&x.OrderState==false)
+                .Where(x => x.Id == id&&x.OrderState==Domain.Enums.OrderState.WaitPayment)
                 .AsNoTracking()
                 .Skip((page - 1) * take)
                 .Take(take).ToListAsync();
@@ -28,49 +28,50 @@ namespace Shop.Infratructure.Repository
 
        
 
-        public async Task<List<OrderSuccessResponseModel>> GetOrderByUserId(Guid id, int page, int take)
+        public async Task<List<OrderResponseModel>> GetOrderByUserId(Guid id, int page, int take)
         {
             var order = await _context.Set<Order>()
                 .Where(x => x.UserId == id)
+                .Include(x=>x.Product)
+                .ThenInclude(x=>x.Image)
                 .AsNoTracking()
                 .Skip((page - 1) * take)
                 .Take(take)
                 
-                .Select(x=>new OrderSuccessResponseModel()
+                .Select(x=>new OrderResponseModel()
                 {
-                    OrderId = id,
-                    ProductName = x.Name,
-                    Amount = x.TotalPrice,
-                    ImageUrl = x.ImageUrl,
-                    OrderState = x.OrderState
+                    OrderId = x.Id,   
+                    Amount = x.TotalPrice,                  
+                    Quantity=x.Quantity,
+                    OrderState=x.OrderState,
+                    ImageUrl=x.Product!.Image!.ImageUrl,
+                    ProductId=x.Product.Id,
+                    ProductName=x.Product.Name,
                 })
                 .ToListAsync();
 
             return order;
         }
 
-        public async Task<Order?> GetOrderDetail(Guid id)
+        public async Task<OrderDetailResponseModel?> GetOrderDetail(Guid id)
         {
             var order = await _context.Set<Order>()
                 .Where(x => x.Id == id)
-                .Select(x=>new Order()
+                .Include(x=>x.Ship)
+                .Include(x=>x.Product)
+                .ThenInclude(x=>x.Image)
+                .AsNoTracking()
+                .Select(x=>new OrderDetailResponseModel
                 {
-                    Id=x.Id,
-                    Name=x.Name,
-                    ImageUrl=x.ImageUrl,
+                    OrderId= x.Id,
+                    ProductId=x.ProductId,
+                    Quantity = x.Quantity,
+                    Amount=x.TotalPrice,
                     OrderState = x.OrderState,
-                    TotalPrice = x.TotalPrice,
-                    ProductId = x.ProductId,
-                    Ship  =  new Ship
-                    {
-                        Id = x.Ship!.Id,
-                        Commune=x.Ship.Commune,
-                        City=x.Ship.City,
-                        StreetAddress=x.Ship.StreetAddress,
-                        District=x.Ship.District,
-                        State=x.Ship.State,
-             
-                    }
+                    ImageUrl = x.Product!.Image!.ImageUrl,
+                    ProductName = x.Product.Name,
+                    Ship=x.Ship,
+                    PaymentMethod=x.PaymentMethod,
                 })
                 .FirstOrDefaultAsync();
 
@@ -80,16 +81,11 @@ namespace Shop.Infratructure.Repository
         public async Task<int> CountOrderIdUser(Guid id)
         {
             return await _context.Set<Order>()
-                .Where(x => x.Id == id&&x.OrderState)
+                .Where(x => x.Id == id)
                 .CountAsync();
         }
         
         
-
-        public async Task<int> CountAsync()
-        {
-            return await _context.Set<Order>().CountAsync();
-        }
 
       
 

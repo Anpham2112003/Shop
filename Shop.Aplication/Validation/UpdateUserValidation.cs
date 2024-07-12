@@ -20,9 +20,7 @@ public class UpdateUserValidation:AbstractValidator<UpdateUserCommand>
             .NotEmpty()
             .Length(2, 150);
         
-        RuleFor(x => x.Password)
-            .NotEmpty()
-            .Length(8, 250);
+    
         
 
 

@@ -4,6 +4,7 @@ using System.Text;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Shop.Domain.Ultils;
 using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands;
@@ -28,46 +29,29 @@ public class HandVerifyAccount : IRequestHandler<VerifyAccountCommand, bool>
     {
         try
         {
-            if (request.AccountToken != null)
-            {
-                var validationToken = GetClaimsPrincipal(request.AccountToken);
-                
-                var email = validationToken.FindFirstValue(ClaimTypes.Email);
+           
+            var validationToken = JwtUltil.ValidateToken(_configuration["EmailConfirm:VerifyUser"]!,request.AccountToken!,out var claims);
 
-                if (email is null) return false;
+            if (validationToken)
+            {
+                var email = claims!.GetEmailFromClaim();
 
                 var user = await _unitOfWork.userRepository.GetUserByEmailAndRole(email);
-                
-                if (user == null) return false;
-                
-                user.IsActive = true;
-                
+
+                user!.IsActive = true;
+
                 await _unitOfWork.SaveChangesAsync();
-                
+
                 return true;
             }
-
+          
             return false;
-
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw;
         }
     }
 
-    private ClaimsPrincipal GetClaimsPrincipal(string token)
-    {
-        JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-        TokenValidationParameters parameters = new TokenValidationParameters()
-        {
-            IssuerSigningKey =
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["EmailConfirm:VerifyUser"])),
-            ValidateLifetime = true,
-            ValidateAudience = false,
-            ValidateIssuer = false
-        };
-
-        return tokenHandler.ValidateToken(token, parameters, out SecurityToken securityToken);
-    }
+   
 }

@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shop.Aplication.Commands.CategoryCommand;
+using Shop.Aplication.Queries;
 using Shop.Aplication.Queries.CategoryQueries;
 
 namespace Shop.Api.Controllers;
-
+[ApiController()]
 [Route("api")]
-public class CategoryController:ControllerBase
+public class CategoryController : ControllerBase
 {
     private readonly IMediator _mediator;
 
@@ -15,18 +16,34 @@ public class CategoryController:ControllerBase
     {
         _mediator = mediator;
     }
-      
-    
+
+
     [HttpGet("categories")]
     public async Task<IActionResult> GetAllCategory()
     {
-        var result = await _mediator.Send(new GetAllCategory());
-        
+        var result = await _mediator.Send(new GetListCategory());
+
         return result != null && result.Any() ? Ok(result) : NotFound();
     }
 
+    [HttpGet("category/{id:guid}/products")]
+    public async Task<IActionResult> GetProductInCategory(Guid id, [FromQuery] int page, int take)
+    {
+        var result = await _mediator.Send(new GetProductsInCategory(id, page, take));
 
-    [Authorize(Roles = "Admin")]
+        return result is null ? NotFound() : Ok(result);
+    }
+
+    [HttpPost("category/addproduct")]
+    public async Task<IActionResult> AddProductToCategory(AddProducToCategoryCommand command)
+    {
+        var result = await _mediator.Send(command);
+
+        return result ? Ok() : BadRequest();
+    }
+
+
+
     [HttpPost("category/create")]
     public async Task<IActionResult> CreateCategory(CreateCategoryCommand command)
     {
@@ -34,6 +51,7 @@ public class CategoryController:ControllerBase
 
         return Ok(result);
     }
+
     [Authorize(Roles = "Admin")]
     [HttpPut("category/edit")]
     public async Task<IActionResult> UpdateCategory(UpdateCategoryCommand command)
@@ -41,6 +59,14 @@ public class CategoryController:ControllerBase
         var result = await _mediator.Send(command);
 
         return result != null ? Ok(result) : BadRequest("Category not exist!");
+    }
+
+    [HttpDelete("unproduct")]
+    public async Task<IActionResult> UnProductCategory(UnCategoryProductCommand command)
+    {
+        var result = await _mediator.Send(command);
+
+        return result?Ok():BadRequest();
     }
 
 

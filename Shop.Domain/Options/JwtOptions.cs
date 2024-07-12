@@ -15,5 +15,7 @@ namespace Shop.Domain.Options
         
         public string? RefreshKey { get; set; }
 
+        public const string IssUser = "tetetttettett";
+        public const string Audienc = "hhdhdhdhdh";
     }
 }

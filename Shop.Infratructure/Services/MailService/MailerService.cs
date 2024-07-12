@@ -28,6 +28,7 @@ public class MailerService:IMailerSeverive
         client.UseDefaultCredentials = false;
         client.Credentials = new NetworkCredential (_configuration["Mailer:Account"].ToString(),_configuration["Mailer:Password"].ToString() );
         client.EnableSsl = true;
+
         await client.SendMailAsync(message);
     }
 }

@@ -4,14 +4,13 @@ using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands.BrandCommand;
 
-public class CreateBrandCommand:IRequest<CreateBrandCommand>
+public class CreateBrandCommand:IRequest<Brand>
 {
-    public  Guid Id => Guid.NewGuid();
     public string? Name { get; set; }
     
 }
 
-public class HandCreateBrandCommand : IRequestHandler<CreateBrandCommand, CreateBrandCommand>
+public class HandCreateBrandCommand : IRequestHandler<CreateBrandCommand, Brand>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -20,17 +19,24 @@ public class HandCreateBrandCommand : IRequestHandler<CreateBrandCommand, Create
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<CreateBrandCommand> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
+    public async Task<Brand> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            await _unitOfWork.brandRepository.AddAsync(new Brand() { Id = request.Id, Name = request.Name });
+            var brand = new Brand()
+            {
+                Id = Guid.NewGuid(),
+                Name = request.Name,
+            };
+            await _unitOfWork.brandRepository.AddAsync(brand);
+
             await _unitOfWork.SaveChangesAsync();
-            return request;
+
+            return brand;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw;
         }
       
     }

@@ -27,12 +27,14 @@ public class HandUpdateCategoryCommand : IRequestHandler<UpdateCategoryCommand,U
             if (category is null) return null;
 
             category.Name = request.Name;
+
             await _unitOfWork.SaveChangesAsync();
+
             return request;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw;
         }
 
     }

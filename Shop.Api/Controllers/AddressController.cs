@@ -4,6 +4,7 @@ using Shop.Aplication.Commands.AddressCommand;
 using Shop.Aplication.Queries;
 
 namespace Shop.Api.Controllers;
+[ApiController]
 [Route("api")]
 public class AddressController:ControllerBase
 {
@@ -14,12 +15,12 @@ public class AddressController:ControllerBase
         _mediator = mediator;
     }
     
-    [HttpGet("address/{id:guid}")]
-    public async Task<IActionResult> GetAddressByUserId(Guid id)
+    [HttpGet("address")]
+    public async Task<IActionResult> GetAddressByUserId()
     {
-        var result = await _mediator.Send(new GetAddressByUserId(id));
+        var result = await _mediator.Send(new GetMyAddress());
 
-        return result.Any() ? NotFound("Not found address!") : Ok(result);
+        return !result.Any() ? NotFound("Not found address!") : Ok(result);
     }
 
     

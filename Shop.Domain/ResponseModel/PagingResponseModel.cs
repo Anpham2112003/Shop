@@ -1,16 +1,17 @@
 ﻿namespace Shop.Domain.ResponseModel ;
 
-public class PagingResponseModel<T>
+public class PagingResponseModel<T> where T : class
 {
-    public string? Message { get; set; }
-    public int Total { get; set; }
-    public T? Data { get; set; }
+    public int CurrentPage {  get; set; } 
+    public int TotalPage { get; set; }
+    public IEnumerable<T>? Data { get; set; }
 
-    public PagingResponseModel(string? message, int total, T? data)
+    public PagingResponseModel( int total, IEnumerable<T>? data, int currentPage)
     {
-        Message = message;
-        Total = total;
+        
+        TotalPage = total;
         Data = data;
+        CurrentPage = currentPage;
     }
 
     public PagingResponseModel()

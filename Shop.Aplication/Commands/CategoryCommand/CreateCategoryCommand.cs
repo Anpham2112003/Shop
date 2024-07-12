@@ -5,13 +5,12 @@ using Exception = System.Exception;
 
 namespace Shop.Aplication.Commands.CategoryCommand;
 
-public class CreateCategoryCommand:IRequest<CreateCategoryCommand>
+public class CreateCategoryCommand:IRequest<Category>
 {
-    public Guid Id =Guid.NewGuid();
     public string? Name { get; set; }
 }
 
-public class HandCreateCategoryCommand : IRequestHandler<CreateCategoryCommand, CreateCategoryCommand>
+public class HandCreateCategoryCommand : IRequestHandler<CreateCategoryCommand, Category>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -20,19 +19,24 @@ public class HandCreateCategoryCommand : IRequestHandler<CreateCategoryCommand, 
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<CreateCategoryCommand> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Category> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            await  _unitOfWork.categoryRepository.AddAsync(new Category() { Id = request.Id, Name = request.Name });
+            var category = new Category()
+            {
+                Id = Guid.NewGuid(),
+                Name = request.Name,
+            };
+            await  _unitOfWork.categoryRepository.AddAsync(category);
             
             await _unitOfWork.SaveChangesAsync();
             
-            return request;
+            return category;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw ;
         }
          
     }

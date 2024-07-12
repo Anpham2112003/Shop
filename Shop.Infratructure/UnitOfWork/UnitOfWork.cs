@@ -1,4 +1,5 @@
-﻿using Shop.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using Shop.Domain.Entities;
 using Shop.Domain.Interfaces;
 using Shop.Infratructure.AplicatonDBcontext;
 using Shop.Infratructure.Repository;
@@ -181,7 +182,19 @@ namespace Shop.Infratructure.UnitOfWork
             }
         }
 
+        public ITagRepository<Tag> tagRepository
+        {
+            get
+            {
+                if(TagRepository == null)
+                {
+                    TagRepository = new TagRepository(_context);
+                }
+                return TagRepository;
+            }
+        }
 
+        private ITagRepository<Tag> TagRepository;
         public void Dispose()
         {
             
@@ -190,7 +203,15 @@ namespace Shop.Infratructure.UnitOfWork
         
         public async Task<int> SaveChangesAsync()
         {
+
           return await _context.SaveChangesAsync();
         }
+
+        public async Task<IDbContextTransaction> StartTransation()
+        {
+           return await _context.Database.BeginTransactionAsync();
+        }
+
+        
     }
-    }
+}

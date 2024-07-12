@@ -1,11 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Shop.Aplication.Commands.ProductCommand;
-using Shop.Aplication.Queries.ProductQueries;
-
+using Shop.Aplication.Queries;
 
 
 namespace Shop.Api.Controllers;
+
+[ApiController]
 [Route("api")]
 public class ProductController:ControllerBase
 {
@@ -16,40 +17,42 @@ public class ProductController:ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("product/create")]
-    public async Task<IActionResult> CreateProduct( CreateProductCommand productCommand,CancellationToken cancellationToken=default)
-    {
-        var result=await _mediator.Send(productCommand,cancellationToken );
-        
-        return Ok(result);
-    }
+   
 
     [HttpGet("product/{id:guid}")]
     public async Task<IActionResult> GetProductDetail(Guid id)
     {
-        var result = await _mediator.Send(new GetProductById() { Id = id });
+        var result = await _mediator.Send(new GetProductDetail() { Id = id });
         
         return result is null ? BadRequest("Product not found ") : Ok(result);
     }
     
-    [HttpGet("products/preview/{page:int:min(1)}/{take:int:min(1)}")]
-    public async Task<IActionResult> GetProductPreview(int page, int take)
+    [HttpGet("product/previews")]
+    public async Task<IActionResult> GetProductPreview([FromQuery]int page, int take)
     {
-        var result = await _mediator.Send(new GetAllProductPreview(page,take));
+        var result = await _mediator.Send(new GetProductsPreview(page,take));
 
         return result is null ? NotFound("Not found product!") : Ok(result);
     }
-    
-    [HttpGet("products/brand/{id:guid}/{page:int:min(1)}/{take:int:min(1)}")]
-    public async Task<IActionResult> GetProductByBrandId(Guid id, int page, int take)
-    {
-        var result = await _mediator.Send(new GetProductsByBrandId(id, page, take));
 
-        return result is null ? NotFound("Not found product! ") : Ok(result);
+    [HttpGet("product/search")]
+    public async Task<IActionResult> SearchProduct([FromQuery]string name,int skip,int take)
+    {
+        var result = await _mediator.Send(new SearchProduct(name,skip,take));
+
+        return result.Data!.Any() ? Ok(result) : NotFound();
     }
-    
+
+    [HttpPost("product/create")]
+    public async Task<IActionResult> CreateProduct([FromForm] CreateProductCommand productCommand, CancellationToken cancellationToken = default)
+    {
+        var result = await _mediator.Send(productCommand, cancellationToken);
+
+        return Ok(result);
+    }
+
     [HttpPut("product/edit")]
-    public async Task<IActionResult> UpdateProductCommand(Guid id,UpdateProductCommand command)
+    public async Task<IActionResult> UpdateProductCommand([FromForm]UpdateProductCommand command)
     {
         
         var result = await _mediator.Send(command);
@@ -64,11 +67,6 @@ public class ProductController:ControllerBase
 
         return result ? Ok("success") : BadRequest("Product not exist!");
     }
-    [HttpGet("product/category/{id:guid}/{page:int:min(1)}/{take:int:range(1,20)}")]
-    public async Task<IActionResult> GetProductByCategoryId(Guid id,int page,int take)
-    {
-        var result = await _mediator.Send(new GetProductsByCategoryId(id,page , take));
-        return result is not null? Ok(result) : NotFound();
-    }
+   
     
 }

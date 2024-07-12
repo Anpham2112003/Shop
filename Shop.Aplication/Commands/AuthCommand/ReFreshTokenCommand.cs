@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Shop.Domain.Entities;
 using Shop.Domain.Options;
 using Shop.Domain.ResponseModel;
+using Shop.Domain.Ultils;
 using Shop.Infratructure.Services.RedisService;
 using Shop.Infratructure.UnitOfWork;
 
@@ -33,39 +34,40 @@ public class HandReFreshTokenCommand : IRequestHandler<ReFreshTokenCommand, Logi
 {
     private readonly IOptions<JwtOptions> _options;
     private readonly IRedisService _redis;
-
-    public HandReFreshTokenCommand(IOptions<JwtOptions> options, IUnitOfWork unitOfWork, IRedisService redis)
+    private readonly IUnitOfWork _unitOfWork;
+    public HandReFreshTokenCommand(IOptions<JwtOptions> options, IRedisService redis, IUnitOfWork unitOfWork)
     {
         _options = options;
         _redis = redis;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<LoginResponseModel?> Handle(ReFreshTokenCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var validateResult =  ValidateToken(request.Token);
+            var validateResult =  JwtUltil.ValidateToken(_options.Value.RefreshKey!,request.Token!,out var claims);
 
             //validate token if token not valid return unAuthorization 
             
-            if (validateResult.Claims.Any())
+            if (validateResult)
             {
-                string? userId = validateResult.FindFirstValue("UserId");
-                var token = await _redis.GetCacheAsync(userId,cancellationToken);
-                // get token from redis if token is null return token expire
-                if (string.IsNullOrEmpty(token)) return null;
-                // check token 
-               
-                //decodeToken get information
-               
-                Debug.WriteLine(userId);
-                //get UserId from claims ;
-                var accessToken = await GenerateToken(validateResult.Claims,_options.Value.IssuerSigningKey, DateTime.UtcNow.AddMinutes(1));
-                
-                var refreshToken= await GenerateToken(validateResult.Claims,_options.Value.RefreshKey,DateTime.UtcNow.AddDays(7));
+                var email = claims!.GetEmailFromClaim();
 
-                await _redis.SetCacheAsync(userId, refreshToken, DateTime.UtcNow.AddDays(7), cancellationToken);
-                //set cache to redis
+                var user = await _unitOfWork.userRepository.GetUserByEmailAndRole(email);
+
+                if (user!.IsActive is false) return null;
+
+                var newclaims = new Claim[]
+                {
+                    new Claim(ClaimTypes.PrimarySid,user!.Id.ToString()),
+                    new Claim(ClaimTypes.Email,user.Email!),
+                    new Claim(ClaimTypes.Role,user.Role!.Name!.ToString())
+                };
+              
+                var accessToken = JwtUltil. GenerateToken(_options.Value.IssuerSigningKey!,newclaims, DateTime.UtcNow.AddMinutes(1));
+                
+                var refreshToken= JwtUltil. GenerateToken(_options.Value.RefreshKey!,newclaims,DateTime.UtcNow.AddDays(7));
 
                 return  new LoginResponseModel(accessToken, refreshToken);
 
@@ -73,50 +75,13 @@ public class HandReFreshTokenCommand : IRequestHandler<ReFreshTokenCommand, Logi
 
             return null;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw;
         }
     }
 
-    private ClaimsPrincipal ValidateToken(string? token)
-    {
-
-        TokenValidationParameters tokenValidationParameters = new TokenValidationParameters()
-        {
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Value.RefreshKey!)),
-            ValidateLifetime = _options.Value.ValidateLifetime,
-            ValidateActor = _options.Value.ValidateActor,
-            ValidateIssuer = _options.Value.ValidateIssuer,
-            ValidIssuer = _options.Value.ValidIssuer,
-            ValidAudience = _options.Value.ValidAudience
-        };
-        
-        JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
-        var result = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-
-        return result;
-    }
-
-    private Task<string> GenerateToken(IEnumerable<Claim> claims,string key, DateTime time)
-    {
-        var keyByte = Encoding.UTF8.GetBytes(key);
-        
-        SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor()
-        {
-            Subject = new ClaimsIdentity(claims),
-            Issuer = _options.Value.ValidIssuer,
-            SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(keyByte), SecurityAlgorithms.HmacSha256),
-            Expires = time
-        };
-
-        JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
-        var token = tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
-        return Task.FromResult(token);
-    }
+    
 
    
 }

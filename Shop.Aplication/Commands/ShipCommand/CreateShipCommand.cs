@@ -12,7 +12,6 @@ public class CreateShipCommand:IRequest<bool>
     
     public Guid OrderId { get; set; }
 
-    public ShipState ShipState = ShipState.Waiting;
     
     public Guid AddressId { get; set; }
     
@@ -38,13 +37,18 @@ public class HandCreateShipCommand:IRequestHandler<CreateShipCommand,bool>
             var order = await _unitOfWork.orderRepository.FindByIdAsync(request.OrderId);
             
             if (address is null||order is null) return false;
-        
-            var ship = _mapper.Map<Ship>(request);
-            
-            ship.StreetAddress = address.StreetAddress;
-            ship.District = address.District;
-            ship.Commune = address.Commune;
-            ship.City = address.City;
+
+            var ship = new Ship()
+            {
+                Id = request.Id,
+                OrderId = order.Id,
+                State=ShipState.Waiting,
+                StreetAddress = address.StreetAddress,
+                District = address.District,
+                Commune = address.Commune,
+                City = address.City,
+                
+            };
 
             await _unitOfWork.shipRepository.AddAsync(ship);
 
@@ -52,10 +56,10 @@ public class HandCreateShipCommand:IRequestHandler<CreateShipCommand,bool>
             
             return true;
         }
-        catch (Exception e)
+        catch (Exception )
         {
 
-            throw new Exception(e.Message);
+            throw ;
         }
        
         

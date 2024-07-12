@@ -16,10 +16,7 @@ namespace Shop.Aplication.Validation
                 .NotNull()
                 .NotEmpty();
 
-            RuleFor(x=>x.TotalPrice)
-                .NotEmpty()
-                .NotEmpty()
-                .GreaterThanOrEqualTo(1000);
+           
 
             RuleFor(x => x.Quantity)
                 .NotEmpty()

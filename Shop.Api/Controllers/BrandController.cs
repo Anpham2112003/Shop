@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shop.Aplication.Commands.BrandCommand;
 using Shop.Aplication.Queries.BrandQueries;
+using Shop.Aplication.Queries;
 
 namespace Shop.Api.Controllers;
+
+[ApiController]
 [Route("api")]
 public class BrandController:ControllerBase
 {
@@ -16,12 +19,20 @@ public class BrandController:ControllerBase
         _mediator = mediator;
     }
 
-
-    [Authorize(Roles = "Admin")]
-    [HttpGet("brands/{page:int:min(1)}/{take:int:min(1)}")]
-    public async Task<IActionResult> GetAllBrand(int page, int take)
+    [HttpGet("brand/{id:guid}/products")]
+    public async Task<IActionResult> GetProductByBrandId(Guid id, int page, int take)
     {
-       var result= await _mediator.Send(new GetAllBrand(page, take));
+        var result = await _mediator.Send(new GetProductByBrandId(id, page, take));
+
+        return result is not  null ? Ok(result) : NotFound();
+    }
+
+
+    [Authorize]
+    [HttpGet("brands")]
+    public async Task<IActionResult> GetAllBrand()
+    {
+       var result= await _mediator.Send(new GetListBrand());
 
        return result.Any() ? Ok(result) : NotFound("Not found brand");
     }

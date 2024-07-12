@@ -33,7 +33,7 @@ namespace Shop.Infratructure.Dependency
         {
             services.AddDbContext<ApplicationDbContext>(op =>
             {
-                op.UseSqlServer(configuration.GetConnectionString("SQL"), op =>
+                op.UseSqlServer(configuration.GetConnectionString("SQL")!, op =>
                 {
                     op.MigrationsAssembly("Shop.Infratructure");
                     

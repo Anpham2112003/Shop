@@ -1,4 +1,5 @@
-﻿using Shop.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using Shop.Domain.Entities;
 using Shop.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,8 @@ namespace Shop.Infratructure.UnitOfWork
         IAddressRepository<Address> addressRepository { get; }
         IPaymentRepository<Payment> paymentRepository { get; }
         
+        ITagRepository<Tag> tagRepository { get; }
         public Task<int> SaveChangesAsync();
-
+        public  Task<IDbContextTransaction> StartTransation();
     }
 }

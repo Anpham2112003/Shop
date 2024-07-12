@@ -49,9 +49,9 @@ public class HandResetPassword : IRequestHandler<ResetPasswordCommand, Object?>
                 email = findEmail.Email
             };
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            return new Exception(e.Message);
+            throw;
         }
        
     }

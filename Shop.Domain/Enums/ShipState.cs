@@ -4,5 +4,6 @@ public enum ShipState
 {
     Waiting,
     Shipping,
-    Success
+    Success,
+    Fail
 }

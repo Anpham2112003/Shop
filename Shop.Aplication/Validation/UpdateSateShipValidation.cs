@@ -12,7 +12,7 @@ namespace Shop.Aplication.Validation
     {
         public UpdateSateShipValidation()
         {
-            RuleFor(x=>x.Id)
+            RuleFor(x=>x.ShipId)
                 .NotEmpty()
                 .NotNull();
 

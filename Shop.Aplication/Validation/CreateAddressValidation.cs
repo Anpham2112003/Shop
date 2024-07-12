@@ -36,9 +36,7 @@ namespace Shop.Aplication.Validation
                 .NotNull()
                 .Length(5,50);
 
-            RuleFor(x=>x.UserId)
-                .NotNull()
-                .NotEmpty();
+         
         }
     }
 }

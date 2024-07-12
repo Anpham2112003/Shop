@@ -6,6 +6,7 @@ using Shop.Aplication.Queries.CartQueries;
 
 namespace Shop.Api.Controllers;
 
+[ApiController]
 [Route("api")]
 public class CartController:ControllerBase
 {
@@ -19,10 +20,10 @@ public class CartController:ControllerBase
 
 
     [Authorize]    
-    [HttpGet("cart/user/{id:guid}/{page:int}/{take:int}")]
-    public async Task<IActionResult> GetCartByUserId(Guid id,int page,int take)
+    [HttpGet("carts")]
+    public async Task<IActionResult> GetCartByUserId([FromQuery] int page,int take)
     {
-        var result = await _mediator.Send(new GetCartByUserId(id, page, take));
+        var result = await _mediator.Send(new GetMyCart( page, take));
 
         return result.Data != null && result.Data.Any() ? Ok(result) : NotFound();
     }
@@ -31,7 +32,7 @@ public class CartController:ControllerBase
 
     [Authorize]
     [HttpPost("cart/add")]
-    public async Task<IActionResult> AddToCart([FromBody]CreateCartCommand command)
+    public async Task<IActionResult> AddToCart(CreateCartCommand command)
     {
         var result = await _mediator.Send(command);
 

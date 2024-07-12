@@ -35,15 +35,18 @@ public class HandDeleteProductCommand:IRequestHandler<DeleteProductCommand,bool>
 
             if (product is null) return false;
 
-            _unitOfWork.productRepository.Remove(product);
+            product.IsDeleted = true;
+            product.DeletedAt = DateTime.UtcNow;
+
+            _unitOfWork.productRepository.Update(product);
             
             await _unitOfWork.SaveChangesAsync();
 
             return true;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw ;
         }
         
         

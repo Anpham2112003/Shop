@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 using MediatR;
 using Microsoft.Extensions.Configuration;
-using Shop.Aplication.Notify;
 using Shop.Domain.Entities;
 using Shop.Domain.Enum;
 using Shop.Domain.ResponseModel;
+using Shop.Infratructure.Services;
 using Shop.Infratructure.Services.PaymentService;
 using Shop.Infratructure.UnitOfWork;
 
@@ -43,30 +43,30 @@ public class HandVnPayReturnCommand:IRequestHandler<VnPayReturnCommand,VnPayResp
     private readonly IUnitOfWork _unitOfWork;
     private readonly IVnPayService _payService;
     private readonly IConfiguration _configuration;
-    private IPublisher _publisher;
-    
-    public HandVnPayReturnCommand(IUnitOfWork unitOfWork, IVnPayService payService, IConfiguration configuration, IPublisher publisher)
+    private readonly IMailerSeverive _mailerSeverive;
+
+    public HandVnPayReturnCommand(IUnitOfWork unitOfWork, IVnPayService payService, IConfiguration configuration, IMailerSeverive mailerSeverive)
     {
         _unitOfWork = unitOfWork;
         _payService = payService;
         _configuration = configuration;
-        _publisher = publisher;
+        _mailerSeverive = mailerSeverive;
     }
 
     public async Task<VnPayResponseModel> Handle(VnPayReturnCommand request, CancellationToken cancellationToken)
     {
-
+        var transaction = await _unitOfWork.StartTransation();
         try
         {
            var t= request.GetType();
            
             foreach (var p in t.GetProperties())
             {
-                _payService.AddResponse(p.Name,p.GetValue(request).ToString());
+                _payService.AddResponse(p.Name,p.GetValue(request)!.ToString()!);
                 
             }
             
-            if (!_payService.CheckHash(request.vnp_SecureHash, _configuration["VNPAY:vnp_HashSecret"]))
+            if (!_payService.CheckHash(request.vnp_SecureHash, _configuration["VNPAY:vnp_HashSecret"]!))
             {
                 return (new VnPayResponseModel()
                 {
@@ -88,10 +88,10 @@ public class HandVnPayReturnCommand:IRequestHandler<VnPayReturnCommand,VnPayResp
                         Message = " Thanh toán thành công ! Nhưng hệ thống bị lỗi liên hệ Admin để được hỗ trợ !"
                     };
             
-                order.OrderState = true;
+                order.OrderState = Domain.Enums.OrderState.Paid;
+
                 order.PaymentMethod = PaymentMethod.VnPay;
-                        
-                await _unitOfWork.SaveChangesAsync();
+                       
                         
                 await _unitOfWork.paymentRepository.AddAsync(new Payment()
                 {
@@ -104,10 +104,14 @@ public class HandVnPayReturnCommand:IRequestHandler<VnPayReturnCommand,VnPayResp
                     OrderId = order.Id
                            
                 });
+
+                var user = await _unitOfWork.userRepository.FindByIdAsync(order.UserId);
+
+                await _mailerSeverive.SendMail(user.Email, "Thanh toan don hang thanh cong", EmailTemplate.Paid(orderId));
             
                 await _unitOfWork.SaveChangesAsync();
 
-                await _publisher.Publish(new PaymentNotification(order),cancellationToken);
+                await transaction.CommitAsync();
                        
                 return new VnPayResponseModel()
                 {
@@ -115,18 +119,20 @@ public class HandVnPayReturnCommand:IRequestHandler<VnPayReturnCommand,VnPayResp
                     Message = "Thanh toán thành công :" + orderId
                 };
             }
-            
-            
+
+
             return new VnPayResponseModel()
             {
                 IsSuccess = false,
                 Message = "Thanh toán không thành công! "
             };
 
+            
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            Console.WriteLine(e);
+           await transaction.RollbackAsync();
+
             throw;
         }
         

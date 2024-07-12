@@ -2,14 +2,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shop.Aplication.Commands;
-using Shop.Aplication.Notify;
+using Shop.Aplication.Commands.AuthCommand;
+using Shop.Aplication.Commands.UserCommand;
 using Shop.Aplication.Queries;
-using Shop.Aplication.Queries.UserQueries;
 using Shop.Domain.ResponseModel;
 
 namespace Shop.Api.Controllers
 {
-    [Route("api/user")]
+    [ApiController]
+    [Route("api/user/profile")]
     public class UserController:ControllerBase
     {
         private readonly ILogger<UserController> _logger;
@@ -25,29 +26,12 @@ namespace Shop.Api.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
-            var user = await _mediator.Send(new GetInfoUserById(id));
+            var user = await _mediator.Send(new GetProfileUser(id));
 
             return user is null ? NotFound("Not found user") : Ok(user);
         }
 
-        [Authorize]
-        [HttpGet("all/{page:int:min(1)}/{take:int:min(1)}")]
-        public async Task<IActionResult> GetAllUser(int page, int take)
-        {
-            var result =await _mediator.Send(new GetAllUser(page, take));
-            
-            return result is not null ? Ok(result) : NotFound("Not found user");
-        }
-
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateUser([FromBody]CreateUserCommand user)
-        {
-           var result=  await  _mediator.Send(user);
-
-           return result ? Ok(user) : BadRequest("User  Exist ! ");
-        }
-
-
+       
 
         [Authorize]
         [HttpPut("edit")]
@@ -56,19 +40,29 @@ namespace Shop.Api.Controllers
             
             var result = await _mediator.Send(user);
 
-            return result ? Ok(result) : BadRequest("Not found Userid =" + user.Id);
+            return result ? Ok(result) : BadRequest("Not found ");
         }
 
-
-
-        [Authorize]        
-        [HttpDelete("delete/{id:guid}")]
-        public async Task<IActionResult> DeleteUserById(Guid id)
+        [Authorize]
+        [HttpPatch("avatar/edit")]
+        public async Task<IActionResult> UpdateAvatar([FromForm]UpdateAvatarUserCommand command)
         {
-            var result = await _mediator.Send(new DeleteUserCommand(id));
+            var result = await _mediator.Send(command);
 
-            return result ? Ok(result) : BadRequest("Not found UserId ="+id);
+            return Ok(result);
         }
+
+        [Authorize]
+        [HttpDelete("avatar/delete")]
+        public async Task<IActionResult> RemoveAvatar()
+        {
+            var result = await _mediator.Send(new RemoveAvatarUserCommand());
+
+            return result ? Ok(result) : BadRequest();
+        }
+
+
+        
         
        
     }

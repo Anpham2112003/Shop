@@ -16,9 +16,10 @@ namespace Shop.Aplication.Validation
                 .NotNull()
                 .NotEmpty();
 
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .NotNull();
+            RuleFor(x => x.Method).IsInEnum();
+
+            RuleFor(x=>x.ProductId).NotNull().NotEmpty();
+          
 
         }
     }

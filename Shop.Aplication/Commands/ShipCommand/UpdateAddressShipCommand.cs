@@ -39,6 +39,8 @@ namespace Shop.Aplication.Commands.ShipCommand
                 ship.Commune = addsress.Commune;
                 ship.District = addsress.District;
 
+                _unitOfWork.shipRepository.Update(ship);
+
                 await _unitOfWork.SaveChangesAsync();
 
                 return true;

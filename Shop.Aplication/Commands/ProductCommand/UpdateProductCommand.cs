@@ -8,11 +8,13 @@ namespace Shop.Aplication.Commands.ProductCommand;
 
 public class UpdateProductCommand:IRequest<UpdateProductCommand?>
 {
-    public Guid Id =Guid.NewGuid();
+    public Guid Id {  get; set; }
 
     public string? Name{get;set;}
         
     public double Price{get;set;}
+    public bool IsDiscount { get;set;}
+    public double PriceDiscount {  get;set;}
         
     public int Quantity{get;set;}
     
@@ -51,9 +53,9 @@ public class HandUpdateProductCommand:IRequestHandler<UpdateProductCommand,Updat
 
             return request;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw ;
         }
         
     }

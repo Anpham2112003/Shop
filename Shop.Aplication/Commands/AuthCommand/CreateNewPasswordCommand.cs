@@ -48,9 +48,9 @@ public class HandCreateNewPasswordCommand : IRequestHandler<CreateNewPasswordCom
 
             return false;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw;
         }
         
     }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Shop.Domain.Enums;
 using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands.ShipCommnd;
@@ -23,18 +24,26 @@ public class HandDeleteShip:IRequestHandler<DeleteShipCommand,bool>
         try
         {
             var ship = await _unitOfWork.shipRepository.FindByIdAsync(request.Id);
-
-            if (ship is null) return false;
-        
-            _unitOfWork.shipRepository.Remove(ship);
             
+            if (ship is null || ship.State==ShipState.Success) return false;
+            
+            var order = await _unitOfWork.orderRepository.GetByIdAsync(ship.OrderId);
+
+            if (order is null) return false;
+
+             order.OrderState=OrderState.Faild;
+
+            _unitOfWork.shipRepository.Remove(ship);
+
+            _unitOfWork.orderRepository.Update(order);
+
             await _unitOfWork.SaveChangesAsync();
 
             return true;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            Console.WriteLine(e);
+            
             throw;
         }
         

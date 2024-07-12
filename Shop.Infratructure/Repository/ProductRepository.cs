@@ -26,6 +26,8 @@ namespace Shop.Infratructure.Repository
                 .Where(x => x.Id == id)
                 .Include(x=>x.Brand)
                 .Include(x => x.Image)
+                .Include(x=>x.Categories)
+                .Include(x=>x.Tags)
                 .Select(x=> new ProductResponseModel()
                 {
                     Id = x.Id,
@@ -33,7 +35,9 @@ namespace Shop.Infratructure.Repository
                     Price = x.Price,
                     Quantity = x.Quantity,
                     Brand = x.Brand,
-                    Image = x.Image
+                    Image = x.Image,
+                    Categories = x.Categories,
+                    Tags = x.Tags,
                 })
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
@@ -50,7 +54,8 @@ namespace Shop.Infratructure.Repository
                     Id = x.Id,
                     Name = x.Name,
                     Price = x.Price,
-                    Image = x.Image
+                    Image = x.Image,
+                    
                 }).OrderBy(x => x.Name)
                 .AsNoTracking()
                 .ToListAsync();
@@ -60,82 +65,34 @@ namespace Shop.Infratructure.Repository
             return product;
         }
 
-        public async Task<List<GetProductByBrandIdResponseModel>> GetProductByBrandId(Guid id, int page, int take)
-        {
-            var products = await _context.Set<Product>()
-                .Where(x => x.BrandId == id)
-                .Skip((page - 1) * take).Take(take)
-                .Include(x => x.Image)
-                .Select(x => new GetProductByBrandIdResponseModel()
+      public async Task<IEnumerable<ProductPreviewResponseModel>> SearchProduct(string Name,int skip,int take )
+      {
+           return await _context.Set<Product>()
+                .Where(x=>x.Name!.StartsWith(Name))
+                .Skip(skip).Take(take).Select(x=> new ProductPreviewResponseModel
                 {
-                    Id = x.Id,
+                    Id=x.Id,
                     Name = x.Name,
                     Price = x.Price,
-                    Quantity = x.Quantity,
-                    Image = x.Image
+                    Image = x.Image,
+                    IsDiscount = x.IsDiscount,
+                    PriceDiscount=x.PriceDiscount,
                 })
                 .ToListAsync();
-            return products;
-        }
 
-        public async Task<List<ProductPreviewResponseModel>> GetProductByCategoryId(Guid id, int page, int take)
-        {
-            var result = await _context.Set<Product>()
-                .Where(x => x.CategoryId == id)
-                .Skip((page - 1) * take).Take(take)
-                .Include(x => x.Image)
-                .Select(x => new ProductPreviewResponseModel()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Price = x.Price,
-                    Image = x.Image
-                })
-                .AsNoTracking()
-                .ToListAsync();
-
-            return result;
-        }
-
-        public async Task<int> CountProductByCategoryId(Guid id)
-        {
-            return await _context.Set<Product>().Where(x => x.CategoryId == id).AsNoTracking().CountAsync();
-        }
+      }
 
 
-        public async Task<int> CountProductByBrandId(Guid id)
-        {
-            var result = await _context.Set<Product>().Where(x => x.BrandId == id).AsNoTracking().CountAsync();
+       
 
-            return result;
-        }
+
 
         public async Task<int> Count()
         {
             return await _context.Set<Product>().CountAsync();  
         }
 
-        public async Task<List<ProductResponseModel>?> GetAllAsync(int page, int take)
-        {
-            var result= await _context.Set<Product>()
-                .Include(x=>x.Brand)
-                .Include(x=>x.Image)
-                .AsNoTracking()
-                .Skip((page-1)*take)
-                .Take(take)
-                .Select(x=>new ProductResponseModel()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Price = x.Price,
-                    Quantity = x.Quantity,
-                    Brand = x.Brand,
-                    Image = x.Image
-                })
-                .OrderBy(x=>x.Name)
-                .ToListAsync();
-            return result;
-        }
+       
 
     }
 }

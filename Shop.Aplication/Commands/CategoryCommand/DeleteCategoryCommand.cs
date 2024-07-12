@@ -37,9 +37,9 @@ public class HandDeleteCategoryCommand : IRequestHandler<DeleteCategoryCommand, 
 
             return true;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw ;
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Shop.Domain.Entities;
+using Shop.Domain.Ultils;
 using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands.CommentCommand;
@@ -8,8 +10,6 @@ namespace Shop.Aplication.Commands.CommentCommand;
 public class CreateCommentCommand:IRequest<bool>
 {
     public Guid Id=Guid.NewGuid();
-    public Guid UserId { get; set; }
-    public string? UserName { get; set; }
     public Guid ProductId { get; set; }
     public string? Content {  get; set; }
     public int Rate {  get; set; }
@@ -20,24 +20,27 @@ public class HandCreateCommentCommand : IRequestHandler<CreateCommentCommand, bo
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-
-    public HandCreateCommentCommand(IUnitOfWork unitOfWork, IMapper mapper)
+    private readonly IHttpContextAccessor _contextAccessor;
+    public HandCreateCommentCommand(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor contextAccessor)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _contextAccessor = contextAccessor;
     }
 
     public async Task<bool> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var user = await _unitOfWork.userRepository.FindByIdAsync(request.UserId);
+            var UserId = Guid.Parse(_contextAccessor.HttpContext!.User.GetIdFromClaim());
         
-            var product = await _unitOfWork.productRepository.FindByIdAsync(request.Id);
+            var product = await _unitOfWork.productRepository.FindByIdAsync(request.ProductId);
 
-            if (user is null || product is null) return false;
+            if ( product is null) return false;
 
             var comment = _mapper.Map<Comment>(request);
+
+            comment.UserId = UserId;
             
             await _unitOfWork.commentRepository.AddAsync(comment);
             
@@ -46,9 +49,9 @@ public class HandCreateCommentCommand : IRequestHandler<CreateCommentCommand, bo
             return true;
 
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw ;
         }
         
         

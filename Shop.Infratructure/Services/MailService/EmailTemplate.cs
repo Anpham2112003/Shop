@@ -19,4 +19,13 @@ public static class EmailTemplate
              <p> code verify password {number} </p>
         </html>";
     }
+
+    public static string Paid(string id)
+    {
+        return $@"
+        <html>
+             <h1> Code </h1>
+             <p> Thanh toan thanh cong don hang {id} </p>
+        </html>";
+    }
 }

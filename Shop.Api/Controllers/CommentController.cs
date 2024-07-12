@@ -15,10 +15,11 @@ public class CommentController:ControllerBase
         _mediator = mediator;
     }
     
-    [HttpGet("comments/product/{id:guid}/{page:int:min(1)}/{take:int:min(1)}")]
-    public async Task<IActionResult> GetCommentByProductId(Guid id,int page,int take)
+
+    [HttpGet("comments/product/{id:guid}")]
+    public async Task<IActionResult> GetCommentByProductId(Guid id,[FromQuery]int skip,int take)
     {
-        var result = await _mediator.Send(new GetCommentByProductId(id, page, take));
+        var result = await _mediator.Send(new GetCommentByProductId(id, skip, take));
 
         return result.Data != null && result.Data.Any()? Ok(result) : NotFound("Not found comment!");
     }

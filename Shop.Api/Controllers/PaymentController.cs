@@ -1,13 +1,15 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Shop.Aplication.Commands.PaymentCommand;
+using Shop.Aplication.Queries;
 using Shop.Domain.Options;
 using Shop.Domain.ResponseModel;
 using VNPAY_CS_ASPX;
 
 namespace Shop.Api.Controllers;
-
+[ApiController]
 [Route("api")]
 public class PaymentController:ControllerBase
 {
@@ -21,6 +23,16 @@ public class PaymentController:ControllerBase
         _options = options;
     }
 
+    [Authorize]
+    [HttpGet("payments")]
+    public async Task<IActionResult> GetPayment( [FromQuery] int page ,int take)
+    {
+        var result = await _mediator.Send(new GetHistoryPayment(page, take));
+
+        return result is null ?  NotFound() : Ok(result);
+    }
+
+    [Authorize]
     [HttpPost("payment/VnPay")]
     public async Task<IActionResult> PaymentVnPay(PaymentCommand command)
     {

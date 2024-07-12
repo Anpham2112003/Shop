@@ -20,28 +20,14 @@ namespace Shop.Aplication.Validation
                 .NotEmpty()
                 .NotNull();
 
-            RuleFor(x=>x.ProductName)
-                .NotEmpty()
-                .NotNull()
-                .Length(5,250);
-
-            RuleFor(x => x.TotalPrice)
-                .NotEmpty()
-                .NotNull()
-                .GreaterThanOrEqualTo(1000);
+         
 
             RuleFor(x=>x.Quantity)
                 .NotNull()
                 .NotEmpty()
                 .GreaterThanOrEqualTo(1);
 
-            RuleFor(x => x.UserId)
-                .NotEmpty()
-                .NotNull();
-
-            RuleFor(x => x.ImageUrl)
-                .NotEmpty()
-                .NotNull();
+           
           
         }
     }

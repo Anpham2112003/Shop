@@ -7,6 +7,7 @@ using Shop.Aplication.Queries;
 
 namespace Shop.Api.Controllers;
 [Route("api")]
+[ApiController]
 public class ShipController:ControllerBase
 {
     private readonly IMediator _mediator;
@@ -21,13 +22,13 @@ public class ShipController:ControllerBase
     [HttpGet("ship/{id:guid}")]
     public async Task<IActionResult> GetShip(Guid id)
     {
-        var result = await _mediator.Send(new GetInfoShip(id));
+        var result = await _mediator.Send(new GetOrderShip(id));
 
         return result is null?NotFound():Ok(result);
     }
 
 
-    [Authorize]
+    [Authorize(Roles ="Admin")]
     [HttpPost("ship/add")]
     public async Task<IActionResult> AddShip(CreateShipCommand command)
     {
@@ -47,7 +48,7 @@ public class ShipController:ControllerBase
         return result ? Ok("success") : BadRequest();
     }
 
-    [Authorize]
+    [Authorize(Roles ="Admin")]
     [HttpPut("ship/address/edit")]
     public async Task<IActionResult> EditAddress(UpdateAddressShipCommand command)
     {
@@ -57,7 +58,7 @@ public class ShipController:ControllerBase
     }
 
 
-    [Authorize]
+    [Authorize(Roles ="Admin")]
     [HttpDelete("ship/remove/{id:guid}")]
     public async Task<IActionResult> RemoveShip(Guid id)
     {

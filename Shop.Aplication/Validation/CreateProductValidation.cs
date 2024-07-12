@@ -29,9 +29,7 @@ public class CreateProductValidation:AbstractValidator<CreateProductCommand>
             .NotNull()
             .NotEmpty();
 
-        RuleFor(x => x.CategoryId)
-            .NotNull()
-            .NotEmpty();
+       
 
         RuleFor(x => x.Image)
             .NotNull()

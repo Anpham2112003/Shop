@@ -24,7 +24,7 @@ namespace Shop.Infratructure.AplicatonDBcontext
         public DbSet<Comment>? Comments { get; set; }
         public DbSet<Category>? Categories { get; set; }
         public DbSet<Brand>?  Brands { get; set; }
-        public DbSet<ProductTag>? ProductTags { get; set; }
+    
         public DbSet<Tag>? Tags { get; set; }
         public DbSet<Payment> Payments { get; set; }
        public DbSet<Ship>? Ships { get; set; }
@@ -90,11 +90,13 @@ namespace Shop.Infratructure.AplicatonDBcontext
 
                 op.HasIndex(x => x.Id);
 
+                op.HasQueryFilter(x => !x.IsDeleted);
+
                 op.HasOne(o => o.Brand)
                     .WithMany(m => m.Products)
                     .HasForeignKey(k => k.BrandId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .IsRequired(false);
 
                
 
@@ -110,11 +112,14 @@ namespace Shop.Infratructure.AplicatonDBcontext
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired();
 
-                op.HasOne(x => x.Category)
+                op.HasMany(x => x.Categories)
                     .WithMany(x => x.Products)
-                    .HasForeignKey(x => x.CategoryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .IsRequired();
+                    .UsingEntity<ProductCategory>();
+
+                op.HasMany(x => x.Tags)
+                    .WithMany(x => x.Products)
+                    .UsingEntity<ProductTag>();
+                   
 
 
                 op.HasMany(x => x.Comments)
@@ -134,6 +139,8 @@ namespace Shop.Infratructure.AplicatonDBcontext
             modelBuilder.Entity<Brand>(op =>
             {
                 op.HasKey(k => k.Id);
+
+               
             });
             modelBuilder.Entity<Image>(op =>
             {
@@ -146,11 +153,16 @@ namespace Shop.Infratructure.AplicatonDBcontext
             {
                 op.HasKey(k => k.Id);
                 op.HasIndex(k => k.Id);
+
+                
             });
+
             modelBuilder.Entity<Cart>(op =>
             {
                 op.HasKey(k => k.Id);
             });
+
+
             modelBuilder.Entity<Order>(op =>
             {
                 op.HasKey(k => k.Id);
@@ -160,13 +172,11 @@ namespace Shop.Infratructure.AplicatonDBcontext
                 op.HasIndex(x => x.ProductId);
 
                 op.HasOne(o => o.Product)
-                .WithOne(o => o.Order)
-                .HasForeignKey<Order>(x=>x.ProductId)
-                .HasConstraintName("order-product")
-                .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired();
+                .WithMany(o => o.Orders)
+                .HasForeignKey(x=>x.ProductId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
                 
-              
                     
             });
 
@@ -176,25 +186,7 @@ namespace Shop.Infratructure.AplicatonDBcontext
 
                
             });
-            modelBuilder.Entity<ProductTag>(x =>
-            {
-                x.HasKey(k => k.Id);
-                
-                x.HasIndex(k => k.ProductId);
-                x.HasIndex(k => k.TagId);
-                x.HasOne(o => o.Product)
-                    .WithMany(m => m.ProductTags)
-                    .HasForeignKey(fk => fk.ProductId)
-                    .IsRequired()
-                    .OnDelete(DeleteBehavior.Cascade);
-                
-                x.HasOne(o => o.Tag)
-                    
-                    .WithMany(m => m.ProductTags)
-                    .HasForeignKey(fk => fk.TagId)
-                    .IsRequired()
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
+          
 
             modelBuilder.Entity<Address>(op =>
             {
@@ -205,8 +197,8 @@ namespace Shop.Infratructure.AplicatonDBcontext
                  op.HasOne(o=>o.User)
                      .WithMany(x=>x.Addresses)
                      .HasForeignKey(x=>x.UserId)
-                     .IsRequired()
-                    .OnDelete(DeleteBehavior.Cascade);
+                     .IsRequired(false)
+                    .OnDelete(DeleteBehavior.NoAction);
              
                   
             });
@@ -222,7 +214,7 @@ namespace Shop.Infratructure.AplicatonDBcontext
                 op.HasOne(o => o.Order)
                     .WithOne(o => o.Ship)
                     .HasForeignKey<Ship>(x => x.OrderId)
-                    .IsRequired()
+                    .IsRequired(false)
                     .OnDelete(DeleteBehavior.ClientSetNull);
             });
 

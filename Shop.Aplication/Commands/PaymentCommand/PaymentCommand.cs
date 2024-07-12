@@ -1,4 +1,6 @@
-﻿namespace Shop.Aplication.Commands.PaymentCommand;
+﻿using MediatR;
+
+namespace Shop.Aplication.Commands.PaymentCommand;
 
 public class PaymentCommand
 {

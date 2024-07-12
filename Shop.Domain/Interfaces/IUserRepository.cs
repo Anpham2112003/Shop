@@ -10,10 +10,8 @@ namespace Shop.Domain.Interfaces
 {
     public interface IUserRepository<Entity>:IGenericRepository<Entity> where Entity :class,BaseEntity
     {
-        Task<List<User>?> GetAllAsyncNoTracking(int page, int take);
         Task<Entity?> GetUserByIdAndRole(Guid id);
         Task<Entity?> GetUserByEmailAndRole(string? email);
-        Task<int> Count();
 
         Task<Entity?> GetInfoUserById(Guid id);
 

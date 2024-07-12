@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Shop.Api.Controllers;
-using Shop.Api.Middleware;
 using Shop.Aplication.Commands;
 using Shop.Aplication.Mapper;
 using Shop.Aplication.Validation;
@@ -16,6 +15,8 @@ using Shop.Domain.Options;
 using Shop.Infratructure.Dependency;
 using Serilog;
 using Microsoft.OpenApi.Models;
+using Shop.Aplication.Commands.AuthCommand;
+using Shop.Aplication.Behavior;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -26,7 +27,7 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<HandErrorMiddleware>();
+builder.Services.AddSingleton<ValidationMiddware>();
 builder.Services.AddInfratrcuture(builder.Configuration);
 
 builder.Services.AddSwaggerGen(opt =>
@@ -60,9 +61,9 @@ builder.Services.AddSwaggerGen(opt =>
 //MediatR config
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(HandCreateUserCommand).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(CreateAccountCommand).Assembly);
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
-    cfg.NotificationPublisher = new TaskWhenAllPublisher();
+    
 });
 
 
@@ -75,7 +76,7 @@ builder.Services.AddAutoMapper(op =>
 
 
 //Validation config
-builder.Services.AddValidatorsFromAssembly(typeof(CreateUserValidation).Assembly) ;
+builder.Services.AddValidatorsFromAssembly(typeof(CreateAddressValidation).Assembly) ;
 
 builder.Services.AddAuthentication(op =>
 {
@@ -93,8 +94,8 @@ builder.Services.AddAuthentication(op =>
         ValidateAudience = true,
         ValidateLifetime= true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:IssuerSigningKey"])),
-        ValidAudience = builder.Configuration["Jwt:ValidAudience"],
-        ValidIssuer = builder.Configuration["Jwt:ValidIssuer"]      
+        ValidAudience = JwtOptions.Audienc,
+        ValidIssuer = JwtOptions.IssUser   
     };
     
 });
@@ -105,6 +106,7 @@ builder.Services.AddOptions<VnPayOptions>()
 builder.Services.AddSignalR();
 builder.Services.AddHttpClient();
 
+builder.Services.AddHttpContextAccessor();
 
 
 
@@ -117,10 +119,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<HandErrorMiddleware>();
+app.UseMiddleware<ValidationMiddware>();
 app.MapControllers();
 
 

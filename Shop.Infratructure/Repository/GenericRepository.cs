@@ -25,7 +25,7 @@ namespace Shop.Infratructure.Repository
 
         public async Task<Entity?> FindByIdAsync(Guid id)
         {
-            var result = await _context.Set<Entity>().FindAsync(id);
+            var result = await _context.Set<Entity>().FirstOrDefaultAsync(x => x.Id == id);
             return result;
         }
 

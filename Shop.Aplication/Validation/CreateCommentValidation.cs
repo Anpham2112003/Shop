@@ -31,9 +31,6 @@ namespace Shop.Aplication.Validation
                 .LessThanOrEqualTo(5)
                 .GreaterThanOrEqualTo(1);
 
-            RuleFor(x => x.UserName)
-                .NotEmpty()
-                .NotNull();
            
 
         }

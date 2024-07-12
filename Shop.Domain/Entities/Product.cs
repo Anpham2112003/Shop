@@ -1,4 +1,5 @@
 ﻿using Shop.Domain.Abstraction;
+using Shop.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Shop.Domain.Entities
 {
-    public class Product:BaseEntity
+    public class Product:BaseEntity,ICreate,ISoftDelete,IModify
     {
 
         public  Guid Id { get; set; }
@@ -16,24 +17,31 @@ namespace Shop.Domain.Entities
         public string? Name{get;set;}
         
         public double Price{get;set;}
-        
         public int Quantity{get;set;}
+
+        public bool IsDiscount { get;set;}
+        public double PriceDiscount{get;set;}
         public string? Description { get;set;}
 
         public Guid? BrandId { get;set;}
-        
-        public Guid? CategoryId { get; set; }
-        public  DateTime CreatedAt { get;set;}
 
-        public DateTime? UpdatedAt { get;set;}
-        
+        public DateTime CreatedAt { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime DeletedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+
+
+
+
+
         public Brand? Brand { get;set;}
         
-        public Category? Category { get; set; }
 
-        public Order? Order { get; set; }
 
-        [JsonIgnore]
+        public List<Order>? Orders { get; set; }
+
+      
         public Image? Image { get; set; }
         
         [JsonIgnore]
@@ -42,13 +50,12 @@ namespace Shop.Domain.Entities
         [JsonIgnore]
 
         public ICollection<Comment>? Comments { get; set; }
-        
-        [JsonIgnore]
-        public ICollection<ProductTag>? ProductTags { get; set; }
-        
-        
-       
-       
 
+        public ICollection<Tag> Tags {  get; } = new List<Tag>();
+        public ICollection<ProductTag> ProductTags { get; } = new List<ProductTag>();
+        public ICollection<Category> Categories { get; } = new List<Category>();
+        public ICollection<ProductCategory> ProductCategories { get; } = new List<ProductCategory>();
+
+      
     }
 }

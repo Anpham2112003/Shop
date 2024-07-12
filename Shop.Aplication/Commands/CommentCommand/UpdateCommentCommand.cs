@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
+using Shop.Domain.Ultils;
 using Shop.Infratructure.UnitOfWork;
 
 namespace Shop.Aplication.Commands.CommentCommand;
@@ -6,7 +8,6 @@ namespace Shop.Aplication.Commands.CommentCommand;
 public class UpdateCommentCommand:IRequest<bool>
 {
     public Guid Id { get; set; }
-    public Guid UserId { get; set; }
     public string? Content { get; set; }
     public int Rate { get; set; }
 }
@@ -14,10 +15,11 @@ public class UpdateCommentCommand:IRequest<bool>
 public class HandUpdateCommand:IRequestHandler<UpdateCommentCommand,bool>
 {
     private readonly IUnitOfWork _unitOfWork;
-
-    public HandUpdateCommand(IUnitOfWork unitOfWork)
+    private readonly IHttpContextAccessor _contextAccessor;
+    public HandUpdateCommand(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
     {
         _unitOfWork = unitOfWork;
+        _contextAccessor = contextAccessor;
     }
 
     public async Task<bool> Handle(UpdateCommentCommand request, CancellationToken cancellationToken)
@@ -26,7 +28,9 @@ public class HandUpdateCommand:IRequestHandler<UpdateCommentCommand,bool>
         {
             var comment = await _unitOfWork.commentRepository.FindByIdAsync(request.Id);
 
-            if (comment is null || comment.UserId.Equals(request.UserId) == false) return false;
+            var UserId = Guid.Parse(_contextAccessor.HttpContext!.User.GetIdFromClaim()); 
+
+            if (comment is null || comment.UserId.Equals(UserId) == false) return false;
 
             comment.Content = request.Content;
             
@@ -36,9 +40,9 @@ public class HandUpdateCommand:IRequestHandler<UpdateCommentCommand,bool>
 
             return true;
         }
-        catch (Exception e)
+        catch (Exception )
         {
-            throw new Exception(e.Message);
+            throw ;
         }
 
     }

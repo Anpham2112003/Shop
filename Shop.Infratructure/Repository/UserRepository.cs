@@ -39,11 +39,6 @@ namespace Shop.Infratructure.Repository
             return result;
         }
 
-        public async Task<int> Count()
-        {
-           return await _context.Set<User>().CountAsync();   
-        }
-
         public async Task<User?> GetInfoUserById(Guid id)
         {
             var user = await _context.Set<User>()
@@ -60,22 +55,6 @@ namespace Shop.Infratructure.Repository
         }
 
 
-        public async Task<List<User>?> GetAllAsyncNoTracking(int page, int take)
-        {
-            var result= await _context.Set<User>()
-                .Skip((page - 1) * take)
-                .Take(take)
-                .AsNoTracking()
-                .Select(x => new User {
-                    Id = x.Id,
-                    FullName = x.FullName,
-                    Email = x.Email,
-                    CreatedAt = x.CreatedAt,
-                    IsDeleted=x.IsDeleted,
-                    Role = x.Role,
-                })
-                .ToListAsync();
-            return result;
-        }
+      
     }
 }
