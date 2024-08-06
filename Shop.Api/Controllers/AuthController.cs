@@ -83,10 +83,10 @@ namespace Shop.Api.Controllers
         }
 
         [Authorize]
-        [HttpDelete("delete/{id:guid}")]
+        [HttpDelete("delete")]
         public async Task<IActionResult> DeleteUserById(Guid id)
         {
-            var result = await _mediator.Send(new DeleteAccountCommand(id));
+            var result = await _mediator.Send(new DeleteAccountCommand());
 
             return result ? Ok(result) : BadRequest("Not found UserId =" + id);
         }

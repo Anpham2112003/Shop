@@ -21,7 +21,7 @@ namespace Shop.Aplication.Commands.AuthCommand
 
         public Guid RoleId = Guid.Parse("c1bb2db4-a327-431f-9d7b-5122d6e17c28");
 
-        public readonly bool IsActive = false;
+        public  bool IsActive = true;
         public DateTime CreatedAt = DateTime.UtcNow;
 
     }
@@ -64,7 +64,7 @@ namespace Shop.Aplication.Commands.AuthCommand
 
                 var codeActive = JwtUltil.GenerateToken(_configuration["EmailConfirm:VerifyUser"]!, claims, DateTime.UtcNow.AddYears(1));
 
-                await _mailerSeverive.SendMail(request.Email!,"VetifyAccount", EmailTemplate.VerifyEmail(codeActive));
+                //await _mailerSeverive.SendMail(request.Email!,"VetifyAccount", EmailTemplate.VerifyEmail(codeActive));
 
                 return true;
             }
